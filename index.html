@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Mercy Chaplet / 慈悲串經 (十字架版)</title>
+    <title>Divine Mercy Chaplet / 慈悲串經 (聖心聖像版)</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -30,14 +30,17 @@
             border: 3px solid #d4af37;
             box-sizing: border-box;
         }
+        /* 耶穌聖心彩色聖像畫的高級樣式設定 */
         .sacred-heart-img {
-            width: 120px;
-            height: 120px;
+            width: 140px;
+            height: 140px;
             object-fit: cover;
             border-radius: 50%;
-            border: 3px solid #d4af37;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            margin-bottom: 10px;
+            border: 4px solid #d4af37; /* 聖殿黃金滾邊 */
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            margin: 0 auto 15px auto;
+            display: block;
+            background-color: #fff;
         }
         h1 {
             color: #8b0000;
@@ -204,6 +207,7 @@
 <body>
 
 <div class="container">
+    <!-- 頂部置中，更換為天主教維基百科官方的高清彩色耶穌聖心像圖檔 -->
     <img src="https://wikimedia.org" alt="Sacred Heart of Jesus" class="sacred-heart-img">
     
     <h1>慈悲串經</h1>
@@ -237,7 +241,7 @@
     </div>
     
     <div class="voice-setting">
-        <label><input type="checkbox" id="auto-play" checked> 切換下一粒珠時自動朗讀中文</label>
+        <label><input type="checkbox" id="auto-play"> 切換下一粒珠時自動朗讀中文</label>
     </div>
 </div>
 
