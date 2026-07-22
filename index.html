@@ -1,51 +1,84 @@
-html<!DOCTYPE html>
+tml<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Divine Mercy Chaplet / 慈悲串經</title>
+    <title>Divine Mercy Chaplet / 慈悲串經 (十字架版)</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
+            background: linear-gradient(rgba(100, 0, 0, 0.85), rgba(40, 0, 0, 0.92)), 
+                        url('https://unsplash.com') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
         .container {
             max-width: 600px;
             width: 100%;
-            background: white;
+            background: rgba(255, 255, 255, 0.96);
+            color: #333;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             text-align: center;
+            border: 3px solid #d4af37;
+            box-sizing: border-box;
+        }
+        .sacred-heart-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #d4af37;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
         }
         h1 {
             color: #8b0000;
-            margin-bottom: 5px;
-            font-size: 24px;
+            margin: 5px 0;
+            font-size: 26px;
+            font-weight: bold;
         }
         h2 {
-            color: #555;
+            color: #b8860b;
             margin-top: 0;
             font-size: 18px;
-            font-weight: normal;
+            font-weight: 600;
         }
         .progress-container {
             display: flex;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
-            gap: 5px;
-            margin: 25px 0;
+            gap: 6px;
+            margin: 20px 0;
             padding: 15px;
             background: #fff5f5;
-            border-radius: 8px;
+            border-radius: 12px;
             border: 1px solid #ffe3e3;
+        }
+        .cross-bead {
+            font-size: 26px;
+            font-weight: bold;
+            color: #ddd;
+            margin-right: 8px;
+            line-height: 1;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+        }
+        .cross-bead.active {
+            color: #ff3333;
+            text-shadow: 0 0 12px #ff3333;
+            transform: scale(1.3);
+        }
+        .cross-bead.completed {
+            color: #8b0000;
         }
         .bead {
             width: 14px;
@@ -53,108 +86,158 @@ html<!DOCTYPE html>
             border-radius: 50%;
             background-color: #ddd;
             transition: all 0.3s ease;
+            border: 1px solid #ccc;
         }
         .bead.large {
-            width: 20px;
-            height: 20px;
-            background-color: #bbb;
+            width: 22px;
+            height: 22px;
+            background-color: #bbaaaa;
+            border: 2px solid #8b0000;
         }
         .bead.active {
-            background-color: #ff4d4d;
-            box-shadow: 0 0 10px #ff4d4d;
-            transform: scale(1.2);
+            background-color: #ff3333;
+            box-shadow: 0 0 12px #ff3333;
+            transform: scale(1.3);
+            border-color: #fff;
         }
         .bead.completed {
             background-color: #8b0000;
+            border-color: #500;
         }
         .prayer-box {
             min-height: 220px;
             margin: 20px 0;
             padding: 20px;
             background: #fafafa;
-            border-left: 5px solid #8b0000;
-            border-radius: 4px;
+            border-left: 6px solid #8b0000;
+            border-radius: 8px;
             text-align: left;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
         }
         .lang-section {
             margin-bottom: 15px;
+        }
+        .lang-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
         }
         .lang-title {
             font-weight: bold;
             color: #8b0000;
             font-size: 14px;
             text-transform: uppercase;
-            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .audio-btn {
+            background-color: #d4af37;
+            color: #333;
+            font-weight: bold;
+            border: 1px solid #b8860b;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .audio-btn:hover {
+            background-color: #e5c158;
+            transform: translateY(-1px);
         }
         .prayer-text {
-            font-size: 16px;
+            font-size: 17px;
             line-height: 1.6;
+            color: #222;
         }
         .controls {
             display: flex;
             justify-content: space-between;
-            gap: 10px;
+            gap: 12px;
             margin-top: 20px;
         }
-        button {
+        button.nav-btn {
             flex: 1;
-            padding: 12px;
+            padding: 14px;
             font-size: 16px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s;
+            font-weight: bold;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .btn-next {
-            background-color: #8b0000;
+            background: linear-gradient(135deg, #8b0000, #a30000);
             color: white;
-            font-weight: bold;
         }
         .btn-next:hover {
-            background-color: #a30000;
+            background: linear-gradient(135deg, #a30000, #c00000);
+            transform: translateY(-1px);
         }
         .btn-prev {
-            background-color: #666;
-            color: white;
+            background-color: #f0f0f0;
+            color: #555;
+            border: 1px solid #ddd;
         }
         .btn-prev:hover {
-            background-color: #555;
+            background-color: #e5e5e5;
         }
         .status-text {
             font-size: 14px;
             color: #666;
-            margin-top: 10px;
+            margin-top: 12px;
+            font-weight: 500;
+        }
+        .voice-setting {
+            margin-top: 18px;
+            font-size: 13px;
+            color: #555;
+            background: #fff8f8;
+            padding: 8px;
+            border-radius: 6px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <img src="https://wikimedia.org" alt="Sacred Heart of Jesus" class="sacred-heart-img">
+    
     <h1>慈悲串經</h1>
     <h2>Divine Mercy Chaplet</h2>
 
-    <!-- Visual Bead Tracker -->
     <div class="progress-container" id="bead-container"></div>
 
-    <!-- Prayer Content Display -->
     <div class="prayer-box">
         <div class="lang-section">
-            <div class="lang-title">繁體中文</div>
+            <div class="lang-header">
+                <div class="lang-title">繁體中文</div>
+                <button class="audio-btn" onclick="speak('zh')">🔊 播放中文 / Speak</button>
+            </div>
             <div class="prayer-text" id="text-zh"></div>
         </div>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
         <div class="lang-section">
-            <div class="lang-title">English</div>
+            <div class="lang-header">
+                <div class="lang-title">English</div>
+                <button class="audio-btn" onclick="speak('en')">🔊 播放英文 / Speak</button>
+            </div>
             <div class="prayer-text" id="text-en"></div>
         </div>
     </div>
 
     <div class="status-text" id="status-display"></div>
 
-    <!-- Navigation Controls -->
     <div class="controls">
-        <button class="btn-prev" onclick="prevStep()">上一步 / Prev</button>
-        <button class="btn-next" onclick="nextStep()">下一步 / Next</button>
+        <button class="nav-btn btn-prev" onclick="prevStep()">上一步 / Prev</button>
+        <button class="nav-btn btn-next" onclick="nextStep()">下一步 / Next</button>
+    </div>
+    
+    <div class="voice-setting">
+        <label><input type="checkbox" id="auto-play" checked> 切換下一粒珠時自動朗讀中文</label>
     </div>
 </div>
 
@@ -174,7 +257,7 @@ const prayers = {
     },
     creed: {
         zh: "我信全能的天主父，天地萬物的創造者。我信父的獨生子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。常生。阿們。",
-        en: "I believe in God, the Father almighty, Creator of heaven and earth, and in Jesus Christ, His only Son, our Lord, who was candy conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died and was buried; He descended into hell; on the third day He rose again from the dead; He ascended into heaven, and is seated at the right hand of God the Father almighty; from there He will come to judge the living and the dead. I believe in the Holy Spirit, the holy catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen."
+        en: "I believe in God, the Father almighty, Creator of heaven and earth, and in Jesus Christ, His only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died and was buried; He descended into hell; on the third day He rose again from the dead; He ascended into heaven, and is seated at the right hand of God the Father almighty; from there He will come to judge the living and the dead. I believe in the Holy Spirit, the holy catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen."
     },
     eternalFather: {
         zh: "永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及神性奉獻給您，以賠補我們及普世的罪過。",
@@ -185,79 +268,8 @@ const prayers = {
         en: "For the sake of His sorrowful Passion, have mercy on us and on the whole world."
     },
     holyGod: {
-        zh: "至聖天主，至聖強有力者，至聖長存者，求您垂憐我們及普世。（念三遍）",
-        en: "Holy God, Holy Mighty One, Holy Immortal One, have mercy on us and on the whole world. (Repeat 3 times)"
+        zh: "至聖天主，至聖強有力者，至聖長存者，求您垂憐我們及普世。",
+        en: "Holy God, Holy Mighty One, Holy Immortal One, have mercy on us and on the whole world."
     },
     conclusion: {
         zh: "耶穌，我信賴祢！因父、及子、及聖神之名。阿們。",
-        en: "Jesus, I trust in You! In the name of the Father, and of the Son, and of the Holy Spirit. Amen."
-    }
-};
-
-let steps = [];
-
-steps.push({ type: 'large', prayer: prayers.signOfCross, label: "開端 / Opening" });
-steps.push({ type: 'small', prayer: prayers.ourFather, label: "天主經 / Our Father" });
-steps.push({ type: 'small', prayer: prayers.hailMary, label: "聖母經 / Hail Mary" });
-steps.push({ type: 'small', prayer: prayers.creed, label: "信經 / Apostles' Creed" });
-
-for (let decade = 1; decade <= 5; decade++) {
-    steps.push({ type: 'large', prayer: prayers.eternalFather, label: `第 ${decade} 端：永生之父 / Decade ${decade}: Eternal Father` });
-    for (let bead = 1; bead <= 10; bead++) {
-        steps.push({ type: 'small', prayer: prayers.sorrowfulPassion, label: `第 ${decade} 端：第 ${bead} 粒珠 / Decade ${decade}: Bead ${bead}` });
-    }
-}
-
-steps.push({ type: 'large', prayer: prayers.holyGod, label: "結尾 / Closing: Holy God" });
-steps.push({ type: 'large', prayer: prayers.conclusion, label: "結束 / Conclusion" });
-
-let currentStepIndex = 0;
-
-const beadContainer = document.getElementById('bead-container');
-steps.forEach((step, index) => {
-    const bead = document.createElement('div');
-    bead.classList.add('bead');
-    if (step.type === 'large') bead.classList.add('large');
-    bead.id = `bead-${index}`;
-    beadContainer.appendChild(bead);
-});
-
-function updateUI() {
-    const currentStep = steps[currentStepIndex];
-    
-    document.getElementById('text-zh').innerText = currentStep.prayer.zh;
-    document.getElementById('text-en').innerText = currentStep.prayer.en;
-    document.getElementById('status-display').innerText = `${currentStep.label} (${currentStepIndex + 1} / ${steps.length})`;
-
-    steps.forEach((_, index) => {
-        const bead = document.getElementById(`bead-${index}`);
-        bead.classList.remove('active', 'completed');
-        
-        if (index === currentStepIndex) {
-            bead.classList.add('active');
-        } else if (index < currentStepIndex) {
-            bead.classList.add('completed');
-        }
-    });
-}
-
-function nextStep() {
-    if (currentStepIndex < steps.length - 1) {
-        currentStepIndex++;
-        updateUI();
-    }
-}
-
-function prevStep() {
-    if (currentStepIndex > 0) {
-        currentStepIndex--;
-        updateUI();
-    }
-}
-
-updateUI();
-</script>
-
-</body>
-</html>
-Use code with caution.
