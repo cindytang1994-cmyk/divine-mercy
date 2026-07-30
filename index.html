@@ -3,167 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>天主教慈悲串經諗珠 (耶穌苦像版)</title>
+    <title>慈悲串經 - 祈禱手冊</title>
     <style>
         body {
-            font-family: 'Microsoft JhengHei', sans-serif;
-            background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), 
-                        url('https://unsplash.com') no-repeat center center fixed;
-            background-size: cover;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #fcfbf7; 
+            background-image: url('https://unsplash.com'); 
+            background-repeat: no-repeat;
+            background-position: center 20%;
+            background-attachment: fixed;
+            background-size: contain;
+            color: #333333;
+            margin: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
         }
-        #app-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            text-align: center;
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(252, 251, 247, 0.85); 
+            z-index: -1;
+        }
+
+        .container {
             max-width: 600px;
             width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-sizing: border-box;
         }
-        .bead-image {
-            width: 140px;
-            height: 140px;
-            object-fit: contain;
-            margin: 15px 0;
-            filter: drop-shadow(0px 5px 6px rgba(0,0,0,0.25));
+
+        h1 {
+            text-align: center;
+            color: #8c6239;
+            font-size: 24px;
+            margin-bottom: 5px;
         }
-        .bounce {
-            animation: jump 0.4s ease-out;
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
         }
-        @keyframes jump {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0); }
+
+        .audio-section {
+            background: #f3ebe1;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
         }
-        #prayer-text {
-            font-size: 22px;
+        
+        .audio-section p {
+            margin: 0 0 10px 0;
             font-weight: bold;
-            color: #4a148c;
-            min-height: 120px;
-            margin: 20px 0;
-            padding: 20px;
-            border-left: 5px solid #8e24aa;
-            background: #f3e5f5;
-            border-radius: 4px;
-            line-height: 1.6;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
-            white-space: pre-line;
+            color: #5c3e21;
         }
-        #counter {
-            font-size: 16px;
-            color: #7f8c8d;
-            font-weight: 600;
+
+        audio {
+            width: 100%;
         }
-        .controls {
+
+        .rosary-beads-container {
             display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
+            flex-direction: column;
+            align-items: center;
+            margin: 30px 0;
+            gap: 12px;
         }
-        button {
-            background-color: #8e24aa;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 25px;
+
+        .crucifix-start {
+            width: 50px;
+            height: 50px;
+            background-image: url('https://flaticon.com'); 
+            background-size: cover;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.2s;
+            transition: transform 0.2s;
         }
-        button:hover {
-            background-color: #a21caf;
-            transform: translateY(-2px);
+
+        .crucifix-start:hover {
+            transform: scale(1.1);
         }
-        button:disabled {
-            background-color: #bdc3c7;
-            cursor: not-allowed;
+
+        .bead {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #d4bda7;
+            border: 2px solid #ba9b7c;
+            display: inline-block;
+        }
+
+        .large-bead {
+            width: 28px;
+            height: 28px;
+            background-color: #8c6239;
+            border: 2px solid #5c3e21;
+        }
+
+        .bead-line {
+            width: 2px;
+            height: 15px;
+            background-color: #ba9b7c;
+        }
+
+        .prayer-section {
+            line-height: 1.8;
+            font-size: 17px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #e0d5c1;
+        }
+
+        .prayer-title {
+            font-weight: bold;
+            color: #8c6239;
+            margin-bottom: 8px;
+        }
+
+        .highlight-final {
+            background-color: #fbf46d;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid #e6c300;
+            margin-top: 30px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
 
-<div id="app-container">
-    <h2>慈悲串經諗珠</h2>
-    <div id="counter">第 1 / 57 步</div>
-    <div><img id="bead-img" class="bead-image" src="" alt="諗珠"></div>
-    <div id="prayer-text">載入中...</div>
-    <div class="controls">
-        <button id="prev-btn" onclick="changePrayer(-1)">上一步</button>
-        <button id="next-btn" onclick="changePrayer(1)">下一粒諗珠</button>
+    <div class="container">
+        <h1>慈悲串經</h1>
+        <div class="subtitle">香港天主教廣東話版本</div>
+
+        <div class="audio-section">
+            <p>🎵 廣東話誦唸語音伴隨</p>
+            <audio controls src="https://soundhelix.com"></audio> 
+            <div style="font-size:11px; color:#888; margin-top:5px;">(註：您亦可點擊上方連結或下方經文隨行祈禱)</div>
+        </div>
+
+        <div class="rosary-beads-container">
+            <div class="bead large-bead"></div>
+            <div class="bead-line"></div>
+            <div class="bead"></div>
+            <div class="bead-line"></div>
+            <div class="bead"></div>
+            <div class="bead-line"></div>
+            <div class="bead"></div>
+            <div class="bead-line"></div>
+            <div class="bead large-bead"></div>
+            <div class="bead-line"></div>
+            <div class="crucifix-start" title="由十字架開始：因父、及子、及聖神之名"></div>
+        </div>
+
+        <div class="prayer-section">
+            <div class="prayer-title">一、開始祈禱（請由最下方的十字架圖示開始）</div>
+            <p>因父、及子、及聖神之名。亞孟。</p>
+        </div>
+
+        <div class="prayer-section">
+            <div class="prayer-title">二、天主經</div>
+            <p>我們的天父，願祢的名受顯揚；願祢的國來臨；願祢的旨意奉行在人間，如同在天上。求祢今天賞給我們日用的食糧；求祢寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑，但救我們免於凶惡。亞孟。</p>
+        </div>
+
+        <div class="prayer-section">
+            <div class="prayer-title">三、聖母經</div>
+            <p>萬福瑪利亞，妳充滿聖寵！主與妳同在。妳在婦女中受讚美，妳的親子耶穌同受讚美。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。亞孟。</p>
+        </div>
+
+        <div class="prayer-section">
+            <div class="prayer-title">四、信經</div>
+            <p>我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恒的生命。阿們。</p>
+        </div>
+
+        <div class="prayer-section">
+            <div class="prayer-title">五、大珠</div>
+            <p>永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。</p>
+        </div>
+
+        <div class="prayer-section">
+            <div class="prayer-title">六、小珠（每端十遍）</div>
+            <p>因祂的至悲慘苦難，求您垂憐我們及普世。</p>
+        </div>
+
+        <div class="prayer-section">
+            <div class="prayer-title">七、結尾（唸三遍）</div>
+            <p>至聖天主，至聖強有力者，至聖長存者，求您垂憐我們及普世。</p>
+        </div>
+
+        <div class="highlight-final">
+            主耶穌，慈悲的君王，我們信賴祢！
+        </div>
     </div>
-</div>
 
-<audio id="narration-audio" src="https://soundhelix.com"></audio>
-
-<script>
-    const prayers = [];
-    
-    // 天主教專用：帶有耶穌聖體的實體十字苦像公開網址
-    const urlCatholicCrucifix = "https://rawpixel.com"; 
-    const urlLargeBead = "https://icons8.com";  
-    const urlSmallBead = "https://icons8.com"; 
-
-    prayers.push({ type: 'cross', time: 0, text: "因父、及子、及聖神之名。阿們。\n（開端祈禱：耶穌，你斷了氣，但為靈魂流出生命的源頭...）" });
-    prayers.push({ type: 'small', time: 10, text: "【天主經】\n我們的天父，願你的名受顯揚；願你的國來臨；願你的旨意奉行在人間，如同在天上。求你今天賞給我們日用的食糧；求你寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑，但救我們免於凶惡。阿們。" });
-    prayers.push({ type: 'small', time: 25, text: "【聖母經】\n萬福瑪利亞，妳充滿聖寵！主與妳同在。妳在婦女中受讚頌，妳的胎子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。阿們。" });
-    prayers.push({ type: 'small', time: 40, text: "【信經】\n我信全能的天主父，天地萬物的創造者。我信父的唯一聖子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生..." });
-
-    for (let decade = 1; decade <= 5; decade++) {
-        prayers.push({ type: 'large', time: 60 + (decade-1)*30, text: `【第 ${decade} 端 · 大諗珠】\n永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及神性奉獻給您，以賠補我們及全世界的罪過。` });
-        for (let bead = 1; bead <= 10; bead++) {
-            prayers.push({ type: 'small', time: 70 + (decade-1)*30 + bead, text: `【第 ${decade} 端 · 小諗珠 第 ${bead} 粒】\n因祂的至慘苦難，求您垂憐我們及全世界。` });
-        }
-    }
-
-    for (let i = 1; i <= 3; i++) {
-        prayers.push({ type: 'small', time: 220 + i, text: `【結尾祈禱 ${i}/3】\n至聖天主，至聖強有力者，至聖長存者，求您垂憐我們及全世界。` });
-    }
-
-    let currentStep = 0;
-    const audio = document.getElementById('narration-audio');
-    const imgElement = document.getElementById('bead-img');
-
-    function updateUI() {
-        const prayer = prayers[currentStep];
-        document.getElementById('counter').innerText = `第 ${currentStep + 1} / ${prayers.length} 步`;
-        document.getElementById('prayer-text').innerText = prayer.text;
-        
-        if (prayer.type === 'cross') {
-            imgElement.src = urlCatholicCrucifix; // 第一步自動顯示天主教耶穌苦像
-        } else if (prayer.type === 'large') {
-            imgElement.src = urlLargeBead;
-        } else {
-            imgElement.src = urlSmallBead;
-        }
-        
-        imgElement.classList.remove('bounce');
-        void imgElement.offsetWidth; 
-        imgElement.classList.add('bounce');
-
-        document.getElementById('prev-btn').disabled = currentStep === 0;
-
-        audio.currentTime = prayer.time;
-        audio.play().catch(e => console.log("等待點擊"));
-    }
-
-    function changePrayer(direction) {
-        currentStep += direction;
-        if (currentStep >= prayers.length) {
-            alert("您已唸完一整個慈悲串經！結語：耶穌，我信賴您！");
-            currentStep = 0;
-        }
-        updateUI();
-    }
-
-    updateUI();
-</script>
 </body>
 </html>
