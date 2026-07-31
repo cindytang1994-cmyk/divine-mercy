@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>神聖慈悲串經 - 玫瑰念珠跳動互動版</title>
+    <title>神聖慈悲串經 - 實體跳動玫瑰念珠全功能版</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -16,7 +16,7 @@
             align-items: center;
         }
         .container {
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
             background: rgba(255, 255, 255, 0.95);
             padding: 25px;
@@ -35,53 +35,63 @@
             font-size: 14px;
             margin-bottom: 20px;
         }
-        
-        /* 玫瑰念珠鏈排版與跳動動畫 */
+        .rosary-display-zone {
+            background: #fdfaf7;
+            border-radius: 12px;
+            border: 1px dashed #8c6239;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .bead-counter-title {
+            font-size: 13px;
+            color: #8c6239;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
         .rosary-chain {
             display: flex;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
-            margin: 20px 0;
-            padding: 15px;
-            background: #fdfaf7;
-            border-radius: 12px;
-            border: 1px dashed #8c6239;
+            gap: 10px;
         }
         .rosary-item {
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0.5;
+            opacity: 0.4;
         }
         .rosary-item.cross {
-            font-size: 26px;
+            font-size: 28px;
+            cursor: default;
         }
-        .rosary-item.bead {
-            width: 24px;
-            height: 24px;
+        .rosary-item.small-bead {
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background-color: #d1e2ec;
-            border: 2px solid #a4c2d4;
+            background-color: #bbdefb;
+            border: 2px solid #90caf9;
         }
-        .rosary-item.large-bead {
-            width: 32px;
-            height: 32px;
+        .rosary-item.big-bead {
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background-color: #ebd7c4;
-            border: 2px solid #c29d7c;
+            background-color: #ffe0b2;
+            border: 2px solid #ffcc80;
         }
-        /* 當前唸到的念珠跳動放大並發光 */
         .rosary-item.active {
             opacity: 1;
-            transform: scale(1.3);
-            box-shadow: 0 0 12px rgba(140, 98, 57, 0.8);
+            transform: scale(1.35);
             background-color: #8c6239 !important;
             border-color: #5c3a1a !important;
+            box-shadow: 0 0 15px rgba(140, 98, 57, 0.9);
+            animation: pulseBead 0.6s infinite alternate;
         }
-
+        @keyframes pulseBead {
+            0% { transform: scale(1.3); }
+            100% { transform: scale(1.45); box-shadow: 0 0 20px rgba(212, 175, 55, 0.8); }
+        }
         .prayer-step {
             background: #ffffff;
             border: 2px solid #e1e8ed;
@@ -112,8 +122,8 @@
             margin-top: 25px;
             position: sticky;
             bottom: 20px;
-            background: rgba(244, 246, 249, 0.9);
-            padding: 10px;
+            background: rgba(244, 246, 249, 0.95);
+            padding: 12px;
             border-radius: 8px;
         }
         button {
@@ -148,15 +158,14 @@
     <h1>天主教廣東話互動版</h1>
     <div class="subtitle">神聖慈悲串經 (Chaplet of Divine Mercy)</div>
     
-    <!-- 玫瑰念珠視覺跳動顯示區 -->
-    <div class="rosary-chain" id="rosaryChain">
-        <!-- 核心由 JavaScript 自動繪製十字架與小珠/大珠 -->
+    <div class="rosary-display-zone">
+        <div class="bead-counter-title" id="loopCounterLabel">📿 當前祈禱進度：準備心神</div>
+        <div class="rosary-chain" id="rosaryVisualChain"></div>
     </div>
 
-    <!-- 經文核心區 -->
     <div class="prayer-step" id="step-0">
         <span class="bead-title">【開始：十字架】</span>
-        <span class="prayer-text">（請準備心神，點擊下方「開始自動連誦」按鈕）</span>
+        <span class="prayer-text">（請平心靜氣，點擊下方「開始自動連誦」按鈕開始祈禱）</span>
     </div>
 
     <div class="prayer-step" id="step-1">
@@ -171,7 +180,7 @@
 
     <div class="prayer-step" id="step-3">
         <span class="bead-title">【第三粒珠】聖母經</span>
-        <span class="prayer-text">萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。阿們。</span>
+        <span class="prayer-text">萬福瑪利亞，妳充滿聖寵。主與祢同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。阿們。</span>
     </div>
 
     <div class="prayer-step" id="step-4">
@@ -180,12 +189,12 @@
     </div>
 
     <div class="prayer-step" id="step-5">
-        <span class="bead-title">【五端：大念珠】每一端前</span>
+        <span class="bead-title">【大念珠】每一端前</span>
         <span class="prayer-text">永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。</span>
     </div>
 
     <div class="prayer-step" id="step-6">
-        <span class="bead-title">【五端：十顆小珠】連續唸十遍</span>
+        <span class="bead-title">【小念珠】連續唸十遍</span>
         <span class="prayer-text">因祂的至悲慘苦難，求您垂憐我們及普世。</span>
     </div>
 
@@ -199,7 +208,6 @@
         <span class="prayer-text">主耶穌，慈悲的君王，我們信賴祢！</span>
     </div>
 
-    <!-- 播放主控鈕 -->
     <div class="control-buttons">
         <button onclick="startAutoPlay()">▶ 開始自動連誦</button>
         <button class="secondary" onclick="stopPlay()">⏸ 暫停</button>
@@ -208,101 +216,90 @@
 </div>
 
 <script>
-    // 動態繪製能跳動的玫瑰念珠結構
-    const chainContainer = document.getElementById('rosaryChain');
-    
-    // 1. 十字架
-    let crossItem = document.createElement('div');
-    crossItem.className = 'rosary-item cross';
-    crossItem.id = 'rosary-0';
-    crossItem.innerText = '✝️';
-    chainContainer.appendChild(crossItem);
+    const chainContainer = document.getElementById('rosaryVisualChain');
+    let cross = document.createElement('div');
+    cross.className = 'rosary-item cross';
+    cross.id = 'node-0';
+    cross.innerText = '✝️';
+    chainContainer.appendChild(cross);
 
-    // 2. 開端前四粒珠子
     for (let i = 1; i <= 4; i++) {
         let bead = document.createElement('div');
-        bead.className = 'rosary-item bead';
-        bead.id = `rosary-${i}`;
+        bead.className = 'rosary-item small-bead';
+        bead.id = `node-${i}`;
         chainContainer.appendChild(bead);
     }
 
-    // 3. 一顆大珠 (象徵每一端前)
-    let largeBead = document.createElement('div');
-    largeBead.className = 'rosary-item large-bead';
-    largeBead.id = 'rosary-5';
-    chainContainer.appendChild(largeBead);
+    let bigBead = document.createElement('div');
+    bigBead.className = 'rosary-item big-bead';
+    bigBead.id = 'node-5';
+    chainContainer.appendChild(bigBead);
 
-    // 4. 十顆小念珠
     for (let i = 1; i <= 10; i++) {
         let smallBead = document.createElement('div');
-        smallBead.className = 'rosary-item bead';
-        smallBead.id = `rosary-6-${i}`;
+        smallBead.className = 'rosary-item small-bead';
+        smallBead.id = `node-6-${i}`;
         chainContainer.appendChild(smallBead);
     }
 
-    let currentStepIndex = 0;
-    let smallBeadLoopCount = 1;
-    let endPrayerLoopCount = 1;
+    let currentStep = 0;
+    let currentDecade = 1;
+    let smallBeadCounter = 1;
+    let endCount = 1;
     let isPlaying = false;
 
     function playStep(index) {
-        if (!isPlaying || index > 8) {
-            resetAll();
+        if (!isPlaying) return;
+        if (currentDecade > 5 && index === 5) {
+            playStep(7);
             return;
         }
+        currentStep = index;
 
-        currentStepIndex = index;
-
-        // 清除上一次的文字高亮
         document.querySelectorAll('.prayer-step').forEach(el => el.classList.remove('highlight'));
         const currentElement = document.getElementById(`step-${index}`);
         currentElement.classList.add('highlight');
         currentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-        // 核心：只抓取 .prayer-text 經文，完全略過【標題文字】不讀
         let pureText = currentElement.querySelector('.prayer-text').innerText;
-
-        // 念珠發光與跳動邏輯更新
-        updateRosaryVisual(index);
+        updateRosaryAnimation(index);
 
         if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
             let utterance = new SpeechSynthesisUtterance(pureText);
             utterance.lang = 'zh-HK';
-            utterance.rate = 0.92; // 莊嚴祈禱語速
+            utterance.rate = 0.90;
 
             utterance.onend = function() {
                 if (!isPlaying) return;
-
-                // 核心邏輯：控制十顆小珠跟三遍結尾的循環自動連誦
-                if (index === 6 && smallBeadLoopCount < 10) {
-                    smallBeadLoopCount++;
-                    playStep(6); // 重複讀小珠經文
-                } else if (index === 6 && smallBeadLoopCount === 10) {
-                    smallBeadLoopCount = 1; // 滿十遍，進到下一階段
-                    playStep(7);
-                } else if (index === 7 && endPrayerLoopCount < 3) {
-                    endPrayerLoopCount++;
-                    playStep(7); // 重複讀三遍結尾
-                } else if (index === 7 && endPrayerLoopCount === 3) {
-                    endPrayerLoopCount = 1;
-                    playStep(8); // 進到最後一句
+                if (index === 5) {
+                    smallBeadCounter = 1;
+                    playStep(6);
+                } else if (index === 6) {
+                    if (smallBeadCounter < 10) {
+                        smallBeadCounter++;
+                        playStep(6);
+                    } else {
+                        currentDecade++;
+                        if (currentDecade <= 5) {
+                            playStep(5);
+                        } else {
+                            playStep(7);
+                        }
+                    }
+                } else if (index === 7) {
+                    if (endCount < 3) {
+                        endCount++;
+                        playStep(7);
+                    } else {
+                        playStep(8);
+                    }
+                } else if (index === 8) {
+                    resetAll();
                 } else {
-                    playStep(index + 1); // 一般常規自動往下走
+                    playStep(index + 1);
                 }
             };
             window.speechSynthesis.speak(utterance);
         }
     }
-
-    // 控制頂部玫瑰念珠圖案同步發光跳動
-    function updateRosaryVisual(index) {
-        document.querySelectorAll('.rosary-item').forEach(b => b.classList.remove('active'));
-        
-        if (index <= 5) {
-            let item = document.getElementById(`rosary-${index}`);
-            if (item) item.classList.add('active');
-        } else if (index === 6) {
-            // 對應當前是第幾顆小念珠亮起
-            let item = document.getElementById(`rosary-6-${smallBeadLoopCount}`);
-            if (item) item.classList.add('active');
-        } else if (index >= 7) {
