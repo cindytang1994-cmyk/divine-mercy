@@ -15,16 +15,11 @@
         #display-panel { background:var(--panel); border-radius:15px; padding:25px; width:100%; box-sizing:border-box; text-align:center; margin-bottom:30px; min-height:150px; display:flex; flex-direction:column; justify-content:center; }
         #prayer-title { color:var(--p-gold); font-size:1.4rem; margin:0 0 10px 0; }
         #prayer-text { font-size:1.2rem; line-height:1.6; margin:0; white-space:pre-line; }
-        
-        /* 串經圖布：寬高調大確保開端與圓環完美銜接 */
-        .rosary-layout-container { position:relative; width:360px; height:460px; margin:20px auto; }
+        .rosary-layout-container { position:relative; width:360px; height:480px; margin:20px auto; }
         .bead { position:absolute; width:22px; height:22px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:bold; color:#aaa; cursor:pointer; transition:all 0.2s; transform:translate(-50%, -50%); left:50%; top:50%; }
-        
-        /* 十字架與大珠 */
         .bead.cross { width:54px; height:54px; border-radius:10px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:1.8rem; z-index:10; }
         .bead.large { width:36px; height:36px; background:#2a4d69; border-color:#4b86b4; color:#adcbe3; font-size:0.75rem; z-index:5; }
         .bead.active { background:var(--p-gold)!important; border-color:#fff!important; color:#000!important; animation:pulse 0.8s infinite alternate; z-index:12; }
-        
         @keyframes pulse { 0% { transform:translate(-50%, -50%) scale(1); box-shadow:0 0 8px var(--glow); } 100% { transform:translate(-50%, -50%) scale(1.3); box-shadow:0 0 25px var(--glow), 0 0 35px var(--p-gold); } }
         .voice-settings { margin-top:15px; font-size:0.9rem; color:#aaa; }
         select { background:#333; color:#fff; border:1px solid #555; padding:5px 10px; border-radius:5px; }
@@ -42,30 +37,28 @@
 const P = {
     s:{t:"因父、及子、及聖神之名",x:"因父、及子、及聖神之名。亞孟。"},
     p:{t:"天主經",x:"我們的天父，願祢的名受顯揚；願祢的國來臨；願祢的旨意奉行在人間，如同在天上。求祢今天賞給我們日用的食糧；求祢寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑；但救我們免於凶惡。亞孟。"},
-    m:{t:"聖母經",x:"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌. 天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。亞孟。"},
+    m:{t:"聖母經",x:"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。亞孟。"},
     c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。亞孟。"},
     e:{t:"永生之父 (大珠)",x:"永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。"},
     h:{t:"因祂的至悲慘苦難 (小珠)",x:"因祂的至悲慘苦難，求您垂憐我們及普世。"},
     g:{t:"至聖天主 (結尾三遍)",x:"至聖天主，至聖強有力者，至聖長存者，求您垂憐我們及普世。"},
-    o:{t:"主耶穌，慈悲的君王，我們信賴祢！",x:"主耶穌，慈悲的君王，我們信賴祢！\n\n因父、及子及聖神之名。亞孟。\n(結束)"}
+    o:{t:"主耶穌，慈悲的君王，我們信賴祢！",x:"主耶穌，慈悲的君王，我們信賴祢！\n\n因父、及子及聖神之名。亞孟。"}
 };
 
 const seq = [];
-// 0: 十字架, 1: 天主經, 2: 聖母經, 3: 信經
+// 十字架、天主經、聖母經、信經（前三珠直接套用 large 藍色外觀樣式）
 seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x,label:"†"});
-seq.push({id:1,type:"small",title:P.p.t,text:P.p.x,label:"1"});
-seq.push({id:2,type:"small",title:P.m.t,text:P.m.x,label:"2"});
-seq.push({id:3,type:"small",title:P.c.t,text:P.c.x,label:"3"});
+seq.push({id:1,type:"large",title:P.p.t,text:P.p.x,label:"1"});
+seq.push({id:2,type:"large",title:P.m.t,text:P.m.x,label:"2"});
+seq.push({id:3,type:"large",title:P.c.t,text:P.c.x,label:"3"});
 
 // 5端循環 (大珠無字，小珠1-10)
 for(let d=0;d<5;d++){
     seq.push({id:seq.length,type:"large",title:P.e.t,text:`(第 ${d+1} 端)\n`+P.e.x,label:""});
     for(let b=0;b<10;b++) seq.push({id:seq.length,type:"small",title:P.h.t,text:`(${b+1}/10)\n`+P.h.x,label:(b+1).toString()});
 }
-// 結尾3遍大珠 (無字)
+// 結尾3遍大珠 (無字，最尾不再添加額外大珠)
 for(let i=0;i<3;i++) seq.push({id:seq.length,type:"large",title:P.g.t,text:`(第 ${i+1} 遍)\n`+P.g.x,label:""});
-// 最終結束聖號，附著在倒數第一顆大珠完成後觸發
-seq.push({id:seq.length,type:"large",title:P.o.t,text:P.o.x,label:""});
 
 let idx=-1, playing=false, synth=window.speechSynthesis, utter=null;
 const btnS=document.getElementById('start-btn'), btnP=document.getElementById('pause-btn'), btnR=document.getElementById('reset-btn');
@@ -73,12 +66,8 @@ const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementBy
 
 function render(){
     box.innerHTML='';
-    const circleRadius = 140; 
-    const centerX = 180;
-    const centerY = 160; // 圓心向上微移，給下方的直線留出空間
-    
-    // 直線部分的起始位置 (十字架在最底部)
-    const crossY = 410, paterY = 360, aveY = 325, credoY = 290;
+    const circleRadius = 140; const centerX = 180; const centerY = 160;
+    const crossY = 430, paterY = 375, aveY = 325, credoY = 275;
 
     seq.forEach((b,i)=>{
         const el=document.createElement('div'); el.className=`bead ${b.type}`; el.innerHTML=b.label;
@@ -89,15 +78,10 @@ function render(){
         else if(i === 2) { posX = centerX; posY = aveY; }
         else if(i === 3) { posX = centerX; posY = credoY; }
         else {
-            // 其餘 54 顆珠子分佈在圓環上 (扣除前4顆開端珠，剩餘 50 顆)
-            const ringIndex = i - 4;
-            const totalRingBeads = seq.length - 4;
-            // 從圓環底部中央正上方 (即Math.PI / 2) 開始繞圈排列
+            const ringIndex = i - 4; const totalRingBeads = seq.length - 4;
             const angle = (ringIndex / totalRingBeads) * 2 * Math.PI + Math.PI / 2;
-            posX = centerX + circleRadius * Math.cos(angle);
-            posY = centerY + circleRadius * Math.sin(angle);
+            posX = centerX + circleRadius * Math.cos(angle); posY = centerY + circleRadius * Math.sin(angle);
         }
-        
         el.style.left = `${posX}px`; el.style.top = `${posY}px`;
         el.onclick=()=>{ if(playing) synth.cancel(); jump(i); }; box.appendChild(el);
     });
@@ -115,13 +99,24 @@ function loadV(){
 if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV; loadV();
 
 function speak(){
-    if(idx<0||idx>=seq.length){ playing=false; btnS.disabled=false; btnP.disabled=true; btnS.innerText="重新開始"; return; }
+    if(idx<0||idx>==seq.length){ endRosary(); return; }
     const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
     let txt=b.text.replace(/\(\d+\/\d+\)/g,'').replace(/\(第\s*\d+\s*[端遍]\)/g,''); utter=new SpeechSynthesisUtterance(txt);
     if(vSel.value){ const voice=synth.getVoices().find(x=>x.name===vSel.value); if(voice) utter.voice=voice; }
-    utter.rate=0.95; utter.onend=()=>{ if(playing){ idx++; speak(); } }; utter.onerror=()=>{ if(playing){ idx++; setTimeout(speak,500); } };
+    utter.rate=0.95; 
+    utter.onend=()=>{ if(playing){ if(idx===seq.length-1){ speakClosing(); } else { idx++; speak(); } } }; 
+    utter.onerror=()=>{ if(playing){ if(idx===seq.length-1){ speakClosing(); } else { idx++; setTimeout(speak,500); } } };
     synth.speak(utter);
 }
+function speakClosing() {
+    tDisp.innerText = P.o.t; xDisp.innerText = P.o.x;
+    document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
+    utter = new SpeechSynthesisUtterance(P.o.x);
+    if(vSel.value){ const voice=synth.getVoices().find(x=>x.name===vSel.value); if(voice) utter.voice=voice; }
+    utter.rate=0.95; utter.onend=()=>{ endRosary(); }; utter.onerror=()=>{ endRosary(); };
+    synth.speak(utter);
+}
+function endRosary() { playing=false; btnS.disabled=false; btnP.disabled=true; btnS.innerText="重新開始"; }
 function jump(i){ idx=i; if(playing) speak(); else { const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update(); } }
 btnS.onclick=()=>{ if(!playing){ playing=true; btnS.disabled=true; btnP.disabled=false; btnP.innerText="暫停"; if(idx===-1||idx>=seq.length) idx=0; speak(); } };
 btnP.onclick=()=>{ if(playing){ playing=false; synth.cancel(); btnP.innerText="繼續"; } else { playing=true; btnP.innerText="暫停"; speak(); } };
