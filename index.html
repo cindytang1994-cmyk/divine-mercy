@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>神聖慈悲串經 - 實體跳動玫瑰念珠全功能版</title>
+    <!-- v2026.08.01.Final.AllInOne -->
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -72,6 +73,7 @@
             border-radius: 50%;
             background-color: #bbdefb;
             border: 2px solid #90caf9;
+            box-sizing: border-box;
         }
         .rosary-item.big-bead {
             width: 28px;
@@ -79,6 +81,7 @@
             border-radius: 50%;
             background-color: #ffe0b2;
             border: 2px solid #ffcc80;
+            box-sizing: border-box;
         }
         .rosary-item.active {
             opacity: 1;
@@ -180,7 +183,7 @@
 
     <div class="prayer-step" id="step-3">
         <span class="bead-title">【第三粒珠】聖母經</span>
-        <span class="prayer-text">萬福瑪利亞，妳充滿聖寵。主與祢同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。阿們。</span>
+        <span class="prayer-text">萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。阿們。</span>
     </div>
 
     <div class="prayer-step" id="step-4">
@@ -300,6 +303,4 @@
                     playStep(index + 1);
                 }
             };
-            window.speechSynthesis.speak(utterance);
-        }
-    }
+Use code with caution.window.speechSynthesis.speak(utterance);}}function updateRosaryAnimation(index) {document.querySelectorAll('.rosary-item').forEach(b => b.classList.remove('active'));const label = document.getElementById('loopCounterLabel');if (index === 0) {document.getElementById('node-0').classList.add('active');label.innerText = "📿 當前祈禱進度：十字架（準備開始）";} else if (index >= 1 && index <= 4) {document.getElementById(node-${index}).classList.add('active');const beadNames = ["", "第一粒珠：聖號經", "第二粒珠：天主經", "第三粒珠：聖母經", "第四粒珠：信經"];label.innerText = 📿 當前祈禱進度：開端 ${beadNames[index]};} else if (index === 5) {document.getElementById('node-5').classList.add('active');label.innerText = 📿 當前祈禱進度：第 ${currentDecade} 端 ➔ 大念珠;} else if (index === 6) {document.getElementById(node-6-${smallBeadCounter}).classList.add('active');label.innerText = 📿 當前祈禱進度：第 ${currentDecade} 端 ➔ 小念珠（第 ${smallBeadCounter} / 10 遍）;} else if (index === 7) {document.getElementById('node-0').classList.add('active');label.innerText = 📿 當前祈禱進度：五端圓滿 ➔ 結尾祈禱（第 ${endCount} / 3 遍）;} else if (index === 8) {document.getElementById('node-0').classList.add('active');label.innerText = "📿 當前祈禱進度：終結（信賴與交託）";}}function startAutoPlay() {if (!isPlaying) {isPlaying = true;if (currentStep === 0) currentStep = 1;playStep(currentStep);}}function stopPlay() {isPlaying = false;if ('speechSynthesis' in window) window.speechSynthesis.cancel();}function resetAll() {stopPlay();currentStep = 0;currentDecade = 1;smallBeadCounter = 1;endCount = 1;document.getElementById('loopCounterLabel').innerText = "📿 當前祈禱進度：重新開始";document.querySelectorAll('.prayer-step').forEach(el => el.classList.remove('highlight'));document.querySelectorAll('.rosary-item').forEach(b => b.classList.remove('active'));window.scrollTo({ top: 0, behavior: 'smooth' });}
