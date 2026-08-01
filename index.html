@@ -40,7 +40,7 @@
 <div class="container">
     <div class="controls"><button id="start-btn">開始誦念</button><button id="pause-btn" disabled>暫停</button><button id="reset-btn">重設</button></div>
     <div id="display-panel"><h2 id="prayer-title">點擊「開始誦念」啟動全自動連續語音功能</h2><p id="prayer-text">本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。</p></div>
-    <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="default">廣東話 (香港)</option></select></div>
+    <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="Google 粵語（香港）">廣東話 - Google 粵語（香港）</option></select></div>
     <div class="rosary-layout-container" id="beads-container"></div>
 </div>
 <script>
@@ -101,9 +101,24 @@ function render(){
     });
 }
 function update(){
-    document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); }else b.classList.remove('active'); });
+    document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); }else b.className=`bead ${seq[i].type}`; });
 }
-function loadV(){
+
+// 優先渲染美觀的經典水滴鏈圈佈局
+render();
+
+function getBestCantoneseVoice() {
+    try {
+        let voices = synth.getVoices();
+        // 優先找帶有 Google 的粵語引擎，其次尋找任何包含 HK / Cantonese / 粵語 的發音人
+        let target = voices.find(x => x.name.includes('Google') && (x.lang.includes('HK') || x.lang.includes('hk')));
+        if(!target) target = voices.find(x => x.lang.includes('HK') || x.lang.includes('hk') || x.lang.toLowerCase().includes('cantonese'));
+        return target;
+    } catch(e) { return null; }
+}
+
+// 動態清單背景靜態初始化，絕不卡死主進程
+function loadV() {
     try {
         let v = synth.getVoices();
         if(!v || v.length === 0) return;
@@ -113,14 +128,10 @@ function loadV(){
             hk.sort((a,b) => b.name.includes('Google') - a.name.includes('Google'));
             hk.forEach(x => { const o = document.createElement('option'); o.value = x.name; o.innerText = `廣東話 - ${x.name}`; if(x.name.includes('Google')) o.selected = true; vSel.appendChild(o); });
         }
-    } catch(e) { console.error(e); }
+    } catch(e) {}
 }
-
-// 優先繪製畫面，確保不受語音加載狀態干擾
-render();
-
 if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
-loadV(); setTimeout(loadV, 300); setTimeout(loadV, 800);
+setTimeout(loadV, 300); setTimeout(loadV, 800);
 
 function speak(){
     if(idx < 0) return;
@@ -128,14 +139,14 @@ function speak(){
     
     synth.cancel();
     const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
-    let txt=b.text.replace(/\(\d+\/\d+\)/g,'').replace(/\(第\s*\d+\s*[端遍]\)/g,''); utter=new SpeechSynthesisUtterance(txt);
-    utter.lang = 'zh-HK';
+    let txt=b.text.replace(/\(\d+\/\d+\)/g,'').replace(/\(第\s*\d+\s*[端遍]\)/g,'');
+    utter=new SpeechSynthesisUtterance(txt);
     
-    let voices = synth.getVoices();
-    let voice = voices.find(x => x.name === vSel.value || x.name.includes('Google'));
-    if(!voice) voice = voices.find(x => x.lang.includes('HK') || x.lang.includes('hk'));
-    if(voice) utter.voice = voice;
-    utter.rate=0.95;
+    // 雙重強制鎖定廣東話
+    utter.lang = 'zh-HK';
+    let v = getBestCantoneseVoice();
+    if(v) utter.voice = v;
+    utter.rate = 0.95;
     
     utter.onend=()=>{ if(playing){ idx++; speak(); } };
     utter.onerror=()=>{ if(playing){ idx++; setTimeout(speak,300); } };
@@ -152,13 +163,11 @@ function speakClosingSequence() {
     document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
     
     let txt = cp.text.replace(/\(第\s*\d+\s*[端遍]\)/g,'');
-    utter = new SpeechSynthesisUtterance(txt); utter.lang = 'zh-HK';
-    
-    let voices = synth.getVoices();
-    let voice = voices.find(x => x.name === vSel.value || x.name.includes('Google'));
-    if(!voice) voice = voices.find(x => x.lang.includes('HK') || x.lang.includes('hk'));
-    if(voice) utter.voice = voice;
-    utter.rate=0.95;
+    utter = new SpeechSynthesisUtterance(txt); 
+    utter.lang = 'zh-HK';
+    let v = getBestCantoneseVoice();
+    if(v) utter.voice = v;
+    utter.rate = 0.95;
     
     utter.onend=()=>{ if(playing){ closingIdx++; speakClosingSequence(); } };
     utter.onerror=()=>{ if(playing){ closingIdx++; setTimeout(speakClosingSequence,300); } };
@@ -170,8 +179,7 @@ function jump(i){ idx=i; if(playing) speak(); else { const b=seq[idx]; tDisp.inn
 
 btnS.onclick=()=>{ if(!playing){ playing=true; btnS.disabled=true; btnP.disabled=false; btnP.innerText="暫停"; if(idx===-1||idx>=seq.length){ idx=0; closingIdx=0; } speak(); } };
 btnP.onclick=()=>{ if(playing){ playing=false; synth.cancel(); btnP.innerText="繼續"; } else { playing=true; btnP.innerText="暫停"; if(idx>=seq.length){ speakClosingSequence(); } else { speak(); } } };
-btnR.onclick=()=>{ playing=false; synth.cancel(); idx=-1; closingIdx=0; btnS.disabled=false; btnP.disabled=true; btnS.innerText="開始誦念"; btnP.innerText="暫停"; tDisp.innerText="點擊「開始誦念」啟動全自動連續語音功能"; xDisp.innerText="本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。"; document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active')); };
-render();
+btnR.onclick=()=>{ playing=false; synth.cancel(); idx=-1; closingIdx=0; btnS.disabled=false; btnP.disabled=true; btnS.innerText="開始誦念"; btnP.innerText="暫停"; tDisp.innerText="點擊「開始誦念」啟動全自動連續語音功能"; xDisp.innerText="本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。"; document.querySelectorAll('.bead').forEach(b=>b.className=`bead ${seq[b.id].type}`); };
 </script>
 </body>
 </html>
