@@ -1,309 +1,98 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>神聖慈悲串經 - 實體跳動玫瑰念珠全功能版</title>
-    <!-- v2026.Final.Deployment.Fixed -->
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>慈悲串經互動朗讀版 - divine-mercy</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f6f9;
-            color: #333333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            max-width: 650px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            box-sizing: border-box;
-            text-align: center;
-        }
-        h1 {
-            color: #8c6239;
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-        .subtitle {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        .rosary-display-zone {
-            background: #fdfaf7;
-            border-radius: 12px;
-            border: 1px dashed #8c6239;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .bead-counter-title {
-            font-size: 13px;
-            color: #8c6239;
-            font-weight: bold;
-            margin-bottom: 12px;
-        }
-        .rosary-chain {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            max-width: 100%;
-            padding: 10px 0;
-        }
-        .rosary-item {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0.3;
-        }
-        .rosary-item.cross {
-            font-size: 30px;
-            cursor: default;
-            opacity: 0.5;
-        }
-        .rosary-item.small-bead {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background-color: #bbdefb;
-            border: 2px solid #90caf9;
-            box-sizing: border-box;
-        }
-        .rosary-item.big-bead {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            background-color: #ffe0b2;
-            border: 2px solid #ffcc80;
-            box-sizing: border-box;
-        }
-        .rosary-item.active {
-            opacity: 1 !important;
-            transform: scale(1.4);
-            background-color: #8c6239 !important;
-            border-color: #5c3a1a !important;
-            box-shadow: 0 0 15px rgba(140, 98, 57, 0.9);
-            animation: pulseBead 0.6s infinite alternate;
-        }
-        @keyframes pulseBead {
-            0% { transform: scale(1.35); }
-            100% { transform: scale(1.55); box-shadow: 0 0 20px rgba(212, 175, 55, 0.9); }
-        }
-        .prayer-step {
-            background: #ffffff;
-            border: 2px solid #e1e8ed;
-            padding: 15px;
-            margin: 12px 0;
-            border-radius: 10px;
-            text-align: left;
-            font-size: 16px;
-            line-height: 1.6;
-            transition: all 0.3s ease;
-        }
-        .prayer-step.highlight {
-            border-color: #8c6239;
-            background-color: #fdfaf7;
-            box-shadow: 0 2px 8px rgba(140, 98, 57, 0.15);
-        }
-        .bead-title {
-            font-weight: bold;
-            color: #8c6239;
-            display: block;
-            font-size: 13px;
-            margin-bottom: 5px;
-        }
-        .control-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-top: 25px;
-            position: sticky;
-            bottom: 20px;
-            background: rgba(244, 246, 249, 0.95);
-            padding: 12px;
-            border-radius: 8px;
-        }
-        button {
-            background-color: #8c6239;
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.2s;
-        }
-        button:hover {
-            background-color: #734d29;
-            transform: translateY(-1px);
-        }
-        button.secondary {
-            background-color: #e1e8ed;
-            color: #333;
-            box-shadow: none;
-        }
-        button.secondary:hover {
-            background-color: #d1d8dd;
-        }
+        :root { --p-gold: #d4af37; --bg: #121212; --panel: #1e1e1e; --txt: #f0f0f0; --glow: rgba(212,175,55,0.8); }
+        body { margin:0; padding:0; background:var(--bg); color:var(--txt); font-family:sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+        header { text-align:center; padding:20px; background:var(--panel); width:100%; box-shadow:0 2px 10px rgba(0,0,0,0.5); }
+        h1 { margin:0; color:var(--p-gold); font-size:1.8rem; }
+        .container { display:flex; flex-direction:column; align-items:center; width:100%; max-width:800px; padding:20px; box-sizing:border-box; }
+        .controls { margin-bottom:20px; display:flex; gap:15px; }
+        button { background:var(--p-gold); color:#000; border:none; padding:12px 24px; font-size:1rem; font-weight:bold; border-radius:25px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.3); }
+        button:disabled { background:#555; color:#888; cursor:not-allowed; }
+        #display-panel { background:var(--panel); border-radius:15px; padding:25px; width:100%; box-sizing:border-box; text-align:center; margin-bottom:30px; min-height:150px; display:flex; flex-direction:column; justify-content:center; }
+        #prayer-title { color:var(--p-gold); font-size:1.4rem; margin:0 0 10px 0; }
+        #prayer-text { font-size:1.2rem; line-height:1.6; margin:0; white-space:pre-line; }
+        .rosary-map { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; background:var(--panel); padding:20px; border-radius:15px; width:100%; box-sizing:border-box; }
+        .bead { width:32px; height:32px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:bold; color:#aaa; cursor:pointer; }
+        .bead.cross { width:38px; height:38px; border-radius:8px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; }
+        .bead.large { width:36px; height:36px; background:#2a4d69; border-color:#4b86b4; color:#adcbe3; }
+        .bead.active { background:var(--p-gold)!important; border-color:#fff!important; color:#000!important; animation:pulse 1s infinite alternate; }
+        @keyframes pulse { 0% { transform:scale(1); box-shadow:0 0 5px var(--glow); } 100% { transform:scale(1.15); box-shadow:0 0 20px var(--glow); } }
+        .voice-settings { margin-top:15px; font-size:0.9rem; color:#aaa; }
+        select { background:#333; color:#fff; border:1px solid #555; padding:5px 10px; border-radius:5px; }
     </style>
 </head>
 <body>
-
+<header><h1>慈悲串經互動朗讀版</h1></header>
 <div class="container">
-    <h1>天主教廣東話互動版</h1>
-    <div class="subtitle">神聖慈悲串經 (Chaplet of Divine Mercy)</div>
-    
-    <div class="rosary-display-zone">
-        <div class="bead-counter-title" id="loopCounterLabel">📿 當前祈禱進度：準備心神</div>
-        <div class="rosary-chain" id="rosaryVisualChain"></div>
-    </div>
-
-    <div class="prayer-step" id="step-0">
-        <span class="bead-title">【開始：十字架】</span>
-        <span class="prayer-text">（請平心靜氣，點擊下方「開始自動連誦」按鈕開始祈禱）</span>
-    </div>
-
-    <div class="prayer-step" id="step-1">
-        <span class="bead-title">【第一粒珠】聖號經</span>
-        <span class="prayer-text">因父、及子、及聖神之名。阿們。</span>
-    </div>
-
-    <div class="prayer-step" id="step-2">
-        <span class="bead-title">【第二粒珠】天主經</span>
-        <span class="prayer-text">我們的天父，願祢的名受顯揚；願祢的國來臨；願祢的旨意奉行在人間，如同在天上。求祢今天賞給我們日用的食糧；求祢寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑；但救我們免於凶惡。阿們。</span>
-    </div>
-
-    <div class="prayer-step" id="step-3">
-        <span class="bead-title">【第三粒珠】聖母經</span>
-        <span class="prayer-text">萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。阿們。</span>
-    </div>
-
-    <div class="prayer-step" id="step-4">
-        <span class="bead-title">【第四粒珠】信經</span>
-        <span class="prayer-text">我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神. 我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恒的生命。阿們。</span>
-    </div>
-
-    <div class="prayer-step" id="step-5">
-        <span class="bead-title">【大念珠】每一端前</span>
-        <span class="prayer-text">永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。</span>
-    </div>
-
-    <div class="prayer-step" id="step-6">
-        <span class="bead-title">【小念珠】連續唸十遍</span>
-        <span class="prayer-text">因祂的至悲慘苦難，求您垂憐我們及普世。</span>
-    </div>
-
-    <div class="prayer-step" id="step-7">
-        <span class="bead-title">【結束祈禱】連續唸三遍</span>
-        <span class="prayer-text">至聖天主，至聖強有力者，至聖長存者，求您垂憐我們及普世。</span>
-    </div>
-
-    <div class="prayer-step" id="step-8">
-        <span class="bead-title">【終結】最後一遍</span>
-        <span class="prayer-text">主耶穌，慈悲的君王，我們信賴祢！</span>
-    </div>
-
-    <div class="control-buttons">
-        <button onclick="startAutoPlay()">▶ 開始自動連誦</button>
-        <button class="secondary" onclick="stopPlay()">⏸ 暫停</button>
-        <button class="secondary" onclick="resetAll()">🔄 重置</button>
-    </div>
+    <div class="controls"><button id="start-btn">開始誦念</button><button id="pause-btn" disabled>暫停</button><button id="reset-btn">重設</button></div>
+    <div id="display-panel"><h2 id="prayer-title">點擊「開始誦念」啟動全自動連續語音功能</h2><p id="prayer-text">本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。</p></div>
+    <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="">載入中...</option></select></div>
+    <h3 style="color:var(--p-gold); margin-top:30px; width:100%; text-align:left;">念珠地圖 (54粒圓圈活動念珠與十字架)</h3>
+    <div class="rosary-map" id="beads-container"></div>
 </div>
-
 <script>
-    const chainContainer = document.getElementById('rosaryVisualChain');
-    
-    let cross = document.createElement('div');
-    cross.className = 'rosary-item cross';
-    cross.id = 'node-0';
-    cross.innerText = '✝️';
-    chainContainer.appendChild(cross);
-
-    for (let i = 1; i <= 4; i++) {
-        let bead = document.createElement('div');
-        bead.className = 'rosary-item small-bead';
-        bead.id = `node-${i}`;
-        chainContainer.appendChild(bead);
-    }
-
-    for (let d = 1; d <= 5; d++) {
-        let bigBead = document.createElement('div');
-        bigBead.className = 'rosary-item big-bead';
-        bigBead.id = `node-big-${d}`;
-        chainContainer.appendChild(bigBead);
-
-        for (let s = 1; s <= 10; s++) {
-            let smallBead = document.createElement('div');
-            smallBead.className = 'rosary-item small-bead';
-            smallBead.id = `node-decade-${d}-${s}`;
-            chainContainer.appendChild(smallBead);
-        }
-    }
-
-    let currentStep = 0;
-    let currentDecade = 1;
-    let smallBeadCounter = 1;
-    let endCount = 1;
-    let isPlaying = false;
-
-    window.onload = function() {
-        resetAll();
-    };
-
-    function playStep(index) {
-        if (!isPlaying) return;
-        currentStep = index;
-
-        document.querySelectorAll('.prayer-step').forEach(el => el.classList.remove('highlight'));
-        const currentElement = document.getElementById(`step-${index}`);
-        currentElement.classList.add('highlight');
-        currentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        let pureText = currentElement.querySelector('.prayer-text').innerText;
-        updateRosaryAnimation(index);
-
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            let utterance = new SpeechSynthesisUtterance(pureText);
-            utterance.lang = 'zh-HK';
-            utterance.rate = 0.90;
-
-            utterance.onend = function() {
-                if (!isPlaying) return;
-                if (index === 5) {
-                    smallBeadCounter = 1;
-                    playStep(6);
-                } else if (index === 6) {
-                    if (smallBeadCounter < 10) {
-                        smallBeadCounter++;
-                        playStep(6);
-                    } else {
-                        currentDecade++;
-                        if (currentDecade <= 5) {
-                            playStep(5);
-                        } else {
-                            playStep(7);
-                        }
-                    }
-                } else if (index === 7) {
-                    if (endCount < 3) {
-                        endCount++;
-                        playStep(7);
-                    } else {
-                        playStep(8);
-                    }
+const P = {
+    s:{t:"因父、及子、及聖神之名",x:"因父、及子、及聖神之名。阿們。"},
+    p:{t:"天主經",x:"我們的天父，願祢的名受顯揚；願祢的國來臨；願祢的旨意奉行在人間，如同在天上。求祢今天賞給我們日用的食糧；求祢寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑；但救我們免於凶惡。阿們。"},
+    m:{t:"聖母經",x:"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。阿們。"},
+    c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。阿們。"},
+    e:{t:"永生之父 (大珠)",x:"永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。"},
+    h:{t:"因祂的至悲慘苦難 (小珠)",x:"因祂的至悲慘苦難，求您垂憐我們及普世。"},
+    g:{t:"至聖天主 (結尾三遍)",x:"至聖天主，至聖強有力者，至聖長存者，求您垂憐我們及普世。"},
+    o:{t:"主耶穌，慈悲的君王，我們信賴祢！",x:"主耶穌，慈悲的君王，我們信賴祢！\n(結束)"}
+};
+const seq = [];
+seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x});
+seq.push({id:1,type:"small",title:P.p.t,text:P.p.x});
+seq.push({id:2,type:"small",title:P.m.t,text:P.m.x});
+seq.push({id:3,type:"small",title:P.c.t,text:P.c.x});
+for(let d=0;d<5;d++){
+    seq.push({id:seq.length,type:"large",title:P.e.t,text:`(第 ${d+1} 端)\n`+P.e.x});
+    for(let b=0;b<10;b++) seq.push({id:seq.length,type:"small",title:P.h.t,text:`(${b+1}/10)\n`+P.h.x});
 }
+for(let i=0;i<3;i++) seq.push({id:seq.length,type:"large",title:P.g.t,text:`(第 ${i+1} 遍)\n`+P.g.x});
+seq.push({id:seq.length,type:"cross",title:P.o.t,text:P.o.x});
+
+let idx=-1, playing=false, synth=window.speechSynthesis, utter=null;
+const btnS=document.getElementById('start-btn'), btnP=document.getElementById('pause-btn'), btnR=document.getElementById('reset-btn');
+const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container'), vSel=document.getElementById('voice-select');
+
+function render(){
+    box.innerHTML='';
+    seq.forEach((b,i)=>{
+        const el=document.createElement('div'); el.className=`bead ${b.type}`; el.innerHTML=b.type==='cross'?'†':i;
+        el.onclick=()=>{ if(playing) synth.cancel(); jump(i); }; box.appendChild(el);
+    });
+}
+function update(){
+    document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); b.scrollIntoView({behavior:'smooth',block:'nearest'}); }else b.classList.remove('active'); });
+}
+function loadV(){
+    let v=synth.getVoices(); vSel.innerHTML='';
+    let hk=v.filter(x=>x.lang.includes('HK')||x.lang.includes('hk')||x.lang.toLowerCase().includes('cantonese')||x.name.includes('Hong Kong'));
+    let res=hk.length>0?hk:v.filter(x=>x.lang.includes('ZH')||x.lang.includes('zh')); if(res.length===0) res=v;
+    res.forEach(x=>{ const o=document.createElement('option'); o.value=x.name; o.innerText=`${x.name} (${x.lang})`; vSel.appendChild(o); });
+    if(vSel.options.length===0){ const o=document.createElement('option'); o.value=""; o.innerText="系統默認語音"; vSel.appendChild(o); }
+}
+if(speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=loadV; loadV();
+
+function speak(){
+    if(idx<0||idx>=seq.length){ playing=false; btnS.disabled=false; btnP.disabled=true; btnS.innerText="重新開始"; return; }
+    const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
+    let txt=b.text.replace(/\(\d+\/\d+\)/g,'').replace(/\(第\s*\d+\s*[端遍]\)/g,''); utter=new SpeechSynthesisUtterance(txt);
+    if(vSel.value){ const voice=synth.getVoices().find(x=>x.name===vSel.value); if(voice) utter.voice=voice; }
+    utter.rate=0.95; utter.onend=()=>{ if(playing){ idx++; speak(); } }; utter.onerror=()=>{ if(playing){ idx++; setTimeout(speak,500); } };
+    synth.speak(utter);
+}
+function jump(i){ idx=i; if(playing) speak(); else { const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update(); } }
+btnS.onclick=()=>{ if(!playing){ playing=true; btnS.disabled=true; btnP.disabled=false; btnP.innerText="暫停"; if(idx===-1||idx>=seq.length) idx=0; speak(); } };
+btnP.onclick=()=>{ if(playing){ playing=false; synth.cancel(); btnP.innerText="繼續"; } else { playing=true; btnP.innerText="暫停"; speak(); } };
+btnR.onclick=()=>{ playing=false; synth.cancel(); idx=-1; btnS.disabled=false; btnP.disabled=true; btnS.innerText="開始誦念"; btnP.innerText="暫停"; tDisp.innerText="點擊「開始誦念」啟動全自動連續語音功能"; xDisp.innerText="本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。"; document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active')); };
+render();
 </script>
 </body>
 </html>
