@@ -30,7 +30,7 @@
 <div class="container">
     <div class="controls"><button id="start-btn">開始誦念</button><button id="pause-btn" disabled>暫停</button><button id="reset-btn">重設</button></div>
     <div id="display-panel"><h2 id="prayer-title">點擊「開始誦念」啟動全自動連續語音功能</h2><p id="prayer-text">本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。</p></div>
-    <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="">載入中...</option></select></div>
+    <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="default">廣東話 (香港)</option></select></div>
     <div class="rosary-layout-container" id="beads-container"></div>
 </div>
 <script>
@@ -46,18 +46,15 @@ const P = {
 };
 
 const seq = [];
-// 十字架、天主經、聖母經、信經（前三珠直接套用 large 藍色外觀樣式）
 seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x,label:"†"});
 seq.push({id:1,type:"large",title:P.p.t,text:P.p.x,label:"1"});
 seq.push({id:2,type:"large",title:P.m.t,text:P.m.x,label:"2"});
 seq.push({id:3,type:"large",title:P.c.t,text:P.c.x,label:"3"});
 
-// 5端循環 (大珠無字，小珠1-10)
 for(let d=0;d<5;d++){
     seq.push({id:seq.length,type:"large",title:P.e.t,text:`(第 ${d+1} 端)\n`+P.e.x,label:""});
     for(let b=0;b<10;b++) seq.push({id:seq.length,type:"small",title:P.h.t,text:`(${b+1}/10)\n`+P.h.x,label:(b+1).toString()});
 }
-// 結尾3遍大珠 (無字，最尾不再添加額外大珠)
 for(let i=0;i<3;i++) seq.push({id:seq.length,type:"large",title:P.g.t,text:`(第 ${i+1} 遍)\n`+P.g.x,label:""});
 
 let idx=-1, playing=false, synth=window.speechSynthesis, utter=null;
@@ -72,7 +69,6 @@ function render(){
     seq.forEach((b,i)=>{
         const el=document.createElement('div'); el.className=`bead ${b.type}`; el.innerHTML=b.label;
         let posX = centerX, posY = crossY;
-        
         if(i === 0) { posX = centerX; posY = crossY; }
         else if(i === 1) { posX = centerX; posY = paterY; }
         else if(i === 2) { posX = centerX; posY = aveY; }
@@ -90,29 +86,44 @@ function update(){
     document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); }else b.classList.remove('active'); });
 }
 function loadV(){
-    let v=synth.getVoices(); vSel.innerHTML='';
-    let hk=v.filter(x=>x.lang.includes('HK')||x.lang.includes('hk')||x.lang.toLowerCase().includes('cantonese')||x.name.includes('Hong Kong'));
-    let res=hk.length>0?hk:v.filter(x=>x.lang.includes('ZH')||x.lang.includes('zh')); if(res.length===0) res=v;
-    res.forEach(x=>{ const o=document.createElement('option'); o.value=x.name; o.innerText=`${x.name} (${x.lang})`; vSel.appendChild(o); });
-    if(vSel.options.length===0){ const o=document.createElement('option'); o.value=""; o.innerText="系統默認語音"; vSel.appendChild(o); }
+    try {
+        let v = synth.getVoices();
+        let hk = v.filter(x => x.lang.includes('HK') || x.lang.includes('hk') || x.lang.toLowerCase().includes('cantonese') || x.name.includes('Hong Kong'));
+        if(hk.length > 0) {
+            vSel.innerHTML = '';
+            hk.forEach(x => { const o = document.createElement('option'); o.value = x.name; o.innerText = `廣東話 - ${x.name}`; vSel.appendChild(o); });
+        } else if(v.length > 0 && vSel.options[0] && vSel.options[0].value === 'default') {
+            vSel.innerHTML = '<option value="zh-HK">廣東話 (香港)</option>';
+        }
+    } catch(e) { console.error(e); }
 }
-if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV; loadV();
+if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
+setTimeout(loadV, 500);
 
 function speak(){
-    if(idx<0||idx>==seq.length){ endRosary(); return; }
+    if(idx<0||idx>=seq.length){ endRosary(); return; }
+    synth.cancel();
     const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
     let txt=b.text.replace(/\(\d+\/\d+\)/g,'').replace(/\(第\s*\d+\s*[端遍]\)/g,''); utter=new SpeechSynthesisUtterance(txt);
-    if(vSel.value){ const voice=synth.getVoices().find(x=>x.name===vSel.value); if(voice) utter.voice=voice; }
+    
+    // 優先設定強制的廣東話語系標籤
+    utter.lang = 'zh-HK';
+    if(vSel.value && vSel.value !== 'default' && vSel.value !== 'zh-HK'){
+        const voice = synth.getVoices().find(x=>x.name===vSel.value);
+        if(voice) utter.voice = voice;
+    }
     utter.rate=0.95; 
     utter.onend=()=>{ if(playing){ if(idx===seq.length-1){ speakClosing(); } else { idx++; speak(); } } }; 
-    utter.onerror=()=>{ if(playing){ if(idx===seq.length-1){ speakClosing(); } else { idx++; setTimeout(speak,500); } } };
+    utter.onerror=()=>{ if(playing){ if(idx===seq.length-1){ speakClosing(); } else { idx++; setTimeout(speak,300); } } };
     synth.speak(utter);
 }
 function speakClosing() {
     tDisp.innerText = P.o.t; xDisp.innerText = P.o.x;
     document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
-    utter = new SpeechSynthesisUtterance(P.o.x);
-    if(vSel.value){ const voice=synth.getVoices().find(x=>x.name===vSel.value); if(voice) utter.voice=voice; }
+    utter = new SpeechSynthesisUtterance(P.o.x); utter.lang = 'zh-HK';
+    if(vSel.value && vSel.value !== 'default' && vSel.value !== 'zh-HK'){
+        const voice = synth.getVoices().find(x=>x.name===vSel.value); if(voice) utter.voice = voice;
+    }
     utter.rate=0.95; utter.onend=()=>{ endRosary(); }; utter.onerror=()=>{ endRosary(); };
     synth.speak(utter);
 }
