@@ -16,19 +16,16 @@
         #prayer-title { color:var(--p-gold); font-size:1.4rem; margin:0 0 10px 0; }
         #prayer-text { font-size:1.2rem; line-height:1.6; margin:0; white-space:pre-line; }
         
-        /* 念珠鏈新樣式：流線型串聯 */
-        .rosary-chain { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; background:var(--panel); padding:30px 20px; border-radius:15px; width:100%; box-sizing:border-box; position:relative; }
-        .bead { width:26px; height:26px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:bold; color:#aaa; cursor:pointer; transition:all 0.2s; position:relative; }
+        /* 圓形頸鏈畫布：完全無外圈線條束縛 */
+        .rosary-circle-container { position:relative; width:340px; height:340px; margin:40px auto; display:flex; justify-content:center; align-items:center; }
+        .bead { position:absolute; width:22px; height:22px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:bold; color:#aaa; cursor:pointer; transition:all 0.2s; transform:translate(-50%, -50%); left:50%; top:50%; }
         
-        /* 珠與珠之間的連接線效果 */
-        .bead:not(:last-child)::after { content:''; position:absolute; right:-6px; top:50%; width:6px; height:2px; background:#555; z-index:0; pointer-events:none; }
+        /* 特大十字架與加大版大珠 */
+        .bead.cross { width:54px; height:54px; border-radius:10px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:1.8rem; z-index:10; }
+        .bead.large { width:36px; height:36px; background:#2a4d69; border-color:#4b86b4; color:#adcbe3; font-size:0.75rem; z-index:5; }
+        .bead.active { background:var(--p-gold)!important; border-color:#fff!important; color:#000!important; animation:pulse 0.8s infinite alternate; z-index:12; }
         
-        /* 特大十字架樣式 */
-        .bead.cross { width:50px; height:50px; border-radius:10px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:1.6rem; font-weight:normal; box-shadow:0 0 10px rgba(0,0,0,0.6); }
-        .bead.large { width:34px; height:34px; background:#2a4d69; border-color:#4b86b4; color:#adcbe3; font-size:0.75rem; }
-        .bead.active { background:var(--p-gold)!important; border-color:#fff!important; color:#000!important; animation:pulse 0.8s infinite alternate; z-index:2; }
-        
-        @keyframes pulse { 0% { transform:scale(1); box-shadow:0 0 8px var(--glow); } 100% { transform:scale(1.25); box-shadow:0 0 25px var(--glow), 0 0 35px var(--p-gold); } }
+        @keyframes pulse { 0% { transform:translate(-50%, -50%) scale(1); box-shadow:0 0 8px var(--glow); } 100% { transform:translate(-50%, -50%) scale(1.3); box-shadow:0 0 25px var(--glow), 0 0 35px var(--p-gold); } }
         .voice-settings { margin-top:15px; font-size:0.9rem; color:#aaa; }
         select { background:#333; color:#fff; border:1px solid #555; padding:5px 10px; border-radius:5px; }
     </style>
@@ -39,19 +36,19 @@
     <div class="controls"><button id="start-btn">開始誦念</button><button id="pause-btn" disabled>暫停</button><button id="reset-btn">重設</button></div>
     <div id="display-panel"><h2 id="prayer-title">點擊「開始誦念」啟動全自動連續語音功能</h2><p id="prayer-text">本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。</p></div>
     <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="">載入中...</option></select></div>
-    <h3 style="color:var(--p-gold); margin-top:30px; width:100%; text-align:left;">慈悲串經念珠鏈</h3>
-    <div class="rosary-chain" id="beads-container"></div>
+    <h3 style="color:var(--p-gold); margin-top:30px; width:100%; text-align:center;">慈悲串經念珠頸鏈</h3>
+    <div class="rosary-circle-container" id="beads-container"></div>
 </div>
 <script>
 const P = {
-    s:{t:"因父、及子、及聖神之名",x:"因父、及子、及聖神之名。阿們。"},
-    p:{t:"天主經",x:"我們的天父，願祢的名受顯揚；願祢的國來臨；願祢的旨意奉行在人間，如同在天上。求祢今天賞給我們日用的食糧；求祢寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑；但救我們免於凶惡。阿們。"},
-    m:{t:"聖母經",x:"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。阿們。"},
-    c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。阿們。"},
+    s:{t:"因父、及子、及聖神之名",x:"因父、及子、及聖神之名。亞孟。"},
+    p:{t:"天主經",x:"我們的天父，願祢的名受顯揚；願祢的國來臨；願祢的旨意奉行在人間，如同在天上。求祢今天賞給我們日用的食糧；求祢寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑；但救我們免於凶惡。亞孟。"},
+    m:{t:"聖母經",x:"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。亞孟。"},
+    c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。亞孟。"},
     e:{t:"永生之父 (大珠)",x:"永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。"},
     h:{t:"因祂的至悲慘苦難 (小珠)",x:"因祂的至悲慘苦難，求您垂憐我們及普世。"},
     g:{t:"至聖天主 (結尾三遍)",x:"至聖天主，至聖強有力者，至聖長存者，求您垂憐我們及普世。"},
-    o:{t:"主耶穌，慈悲的君王，我們信賴祢！",x:"主耶穌，慈悲的君王，我們信賴祢！\n(結束)"}
+    o:{t:"主耶穌，慈悲的君王，我們信賴祢！",x:"主耶穌，慈悲的君王，我們信賴祢！\n\n因父、及子及聖神之名。亞孟。\n(結束)"}
 };
 const seq = [];
 seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x});
@@ -71,13 +68,22 @@ const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementBy
 
 function render(){
     box.innerHTML='';
+    const total = seq.length;
+    const radius = 140; // 圓形頸鏈半徑
     seq.forEach((b,i)=>{
         const el=document.createElement('div'); el.className=`bead ${b.type}`; el.innerHTML=b.type==='cross'?'†':i;
+        
+        // 透過三角函數將 54 顆珠子精密分佈在 360 度圓周上，並旋轉讓十字架居於正下方 (90度)
+        const angle = (i / total) * 2 * Math.PI + Math.PI / 2;
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
+        el.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+        
         el.onclick=()=>{ if(playing) synth.cancel(); jump(i); }; box.appendChild(el);
     });
 }
 function update(){
-    document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); b.scrollIntoView({behavior:'smooth',block:'nearest'}); }else b.classList.remove('active'); });
+    document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); }else b.classList.remove('active'); });
 }
 function loadV(){
     let v=synth.getVoices(); vSel.innerHTML='';
