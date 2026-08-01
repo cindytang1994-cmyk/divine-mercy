@@ -15,7 +15,7 @@
         #display-panel { background:var(--panel); border-radius:15px; padding:25px; width:100%; box-sizing:border-box; text-align:center; margin-bottom:30px; min-height:150px; display:flex; flex-direction:column; justify-content:center; }
         #prayer-title { color:var(--p-gold); font-size:1.4rem; margin:0 0 10px 0; }
         #prayer-text { font-size:1.2rem; line-height:1.6; margin:0; white-space:pre-line; }
-        .rosary-layout-container { position:relative; width:360px; height:480px; margin:20px auto; }
+        .rosary-layout-container { position:relative; width:380px; height:480px; margin:20px auto; }
         .bead { position:absolute; width:22px; height:22px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:bold; color:#aaa; cursor:pointer; transition:all 0.2s; transform:translate(-50%, -50%); left:50%; top:50%; }
         .bead.cross { width:54px; height:54px; border-radius:10px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:1.8rem; z-index:10; }
         .bead.large { width:36px; height:36px; background:#2a4d69; border-color:#4b86b4; color:#adcbe3; font-size:0.75rem; z-index:5; }
@@ -30,7 +30,7 @@
 <div class="container">
     <div class="controls"><button id="start-btn">開始誦念</button><button id="pause-btn" disabled>暫停</button><button id="reset-btn">重設</button></div>
     <div id="display-panel"><h2 id="prayer-title">點擊「開始誦念」啟動全自動連續語音功能</h2><p id="prayer-text">本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。</p></div>
-    <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="default">廣東話 (香港)</option></select></div>
+    <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="Google 粵語（香港）">廣東話 - Google 粵語（香港）</option></select></div>
     <div class="rosary-layout-container" id="beads-container"></div>
 </div>
 <script>
@@ -41,15 +41,16 @@ const P = {
     c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。亞孟。"},
     e:{t:"永生之父 (大珠)",x:"永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。"},
     h:{t:"因祂的至悲慘苦難 (小珠)",x:"因祂的至悲慘苦難，求您垂憐我們及普世。"},
-    g:{t:"至聖天主 (結尾三遍)",x:"至聖天主，至聖強有力者，至聖長存者，求您垂憐我們及普世。"},
+    g:{t:"至聖天主 (結尾三遍)",x:"至聖天主，至聖強有力者，致聖長存者，求您垂憐我們及普世。"},
     o:{t:"主耶穌，慈悲的君王，我們信賴祢！",x:"主耶穌，慈悲的君王，我們信賴祢！\n\n因父、及子及聖神之名。亞孟。"}
 };
 
 const seq = [];
 seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x,label:"†"});
-seq.push({id:1,type:"large",title:P.p.t,text:P.p.x,label:"1"});
-seq.push({id:2,type:"large",title:P.m.t,text:P.m.x,label:"2"});
-seq.push({id:3,type:"large",title:P.c.t,text:P.c.x,label:"3"});
+seq.push({id:1,type:"large",title:P.s.t,text:P.s.x,label:""});
+seq.push({id:2,type:"large",title:P.p.t,text:P.p.x,label:"1"});
+seq.push({id:3,type:"large",title:P.m.t,text:P.m.x,label:"2"});
+seq.push({id:4,type:"large",title:P.c.t,text:P.c.x,label:"3"});
 
 for(let d=0;d<5;d++){
     seq.push({id:seq.length,type:"large",title:P.e.t,text:`(第 ${d+1} 端)\n`+P.e.x,label:""});
@@ -62,21 +63,22 @@ const btnS=document.getElementById('start-btn'), btnP=document.getElementById('p
 const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container'), vSel=document.getElementById('voice-select');
 
 function render(){
-    box.innerHTML='';
-    const circleRadius = 140; const centerX = 180; const centerY = 160;
-    const crossY = 430, paterY = 375, aveY = 325, credoY = 275;
+    box.innerHTML=''; const centerX = 190, centerY = 190;
+    const crossY = 440, signY = 385, paterY = 340, aveY = 300, credoY = 260;
 
     seq.forEach((b,i)=>{
         const el=document.createElement('div'); el.className=`bead ${b.type}`; el.innerHTML=b.label;
         let posX = centerX, posY = crossY;
         if(i === 0) { posX = centerX; posY = crossY; }
-        else if(i === 1) { posX = centerX; posY = paterY; }
-        else if(i === 2) { posX = centerX; posY = aveY; }
-        else if(i === 3) { posX = centerX; posY = credoY; }
+        else if(i === 1) { posX = centerX; posY = signY; }
+        else if(i === 2) { posX = centerX; posY = paterY; }
+        else if(i === 3) { posX = centerX; posY = aveY; }
+        else if(i === 4) { posX = centerX; posY = credoY; }
         else {
-            const ringIndex = i - 4; const totalRingBeads = seq.length - 4;
+            const ringIndex = i - 5; const totalRingBeads = seq.length - 5;
             const angle = (ringIndex / totalRingBeads) * 2 * Math.PI + Math.PI / 2;
-            posX = centerX + circleRadius * Math.cos(angle); posY = centerY + circleRadius * Math.sin(angle);
+            const radiusX = 145 * Math.cos(angle); const radiusY = 115 * Math.sin(angle) * (1 - 0.22 * Math.sin(angle));
+            posX = centerX + radiusX; posY = centerY - 35 + radiusY;
         }
         el.style.left = `${posX}px`; el.style.top = `${posY}px`;
         el.onclick=()=>{ if(playing) synth.cancel(); jump(i); }; box.appendChild(el);
@@ -91,29 +93,29 @@ function loadV(){
         let hk = v.filter(x => x.lang.includes('HK') || x.lang.includes('hk') || x.lang.toLowerCase().includes('cantonese') || x.name.includes('Hong Kong'));
         if(hk.length > 0) {
             vSel.innerHTML = '';
-            hk.forEach(x => { const o = document.createElement('option'); o.value = x.name; o.innerText = `廣東話 - ${x.name}`; vSel.appendChild(o); });
-        } else if(v.length > 0 && vSel.options[0] && vSel.options[0].value === 'default') {
-            vSel.innerHTML = '<option value="zh-HK">廣東話 (香港)</option>';
+            // 確保「Google 粵語（香港）」排在選單最前方並優先選中
+            hk.sort((a,b) => b.name.includes('Google') - a.name.includes('Google'));
+            hk.forEach(x => { const o = document.createElement('option'); o.value = x.name; o.innerText = `廣東話 - ${x.name}`; if(x.name.includes('Google')) o.selected = true; vSel.appendChild(o); });
         }
     } catch(e) { console.error(e); }
 }
 if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
-setTimeout(loadV, 500);
+setTimeout(loadV, 400);
 
 function speak(){
     if(idx<0||idx>=seq.length){ endRosary(); return; }
     synth.cancel();
     const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
     let txt=b.text.replace(/\(\d+\/\d+\)/g,'').replace(/\(第\s*\d+\s*[端遍]\)/g,''); utter=new SpeechSynthesisUtterance(txt);
-    
-    // 優先設定強制的廣東話語系標籤
     utter.lang = 'zh-HK';
-    if(vSel.value && vSel.value !== 'default' && vSel.value !== 'zh-HK'){
-        const voice = synth.getVoices().find(x=>x.name===vSel.value);
-        if(voice) utter.voice = voice;
-    }
-    utter.rate=0.95; 
-    utter.onend=()=>{ if(playing){ if(idx===seq.length-1){ speakClosing(); } else { idx++; speak(); } } }; 
+    
+    // 強制比對選單或背景音軌中的 Google 粵語引擎
+    let targetVoice = synth.getVoices().find(x => x.name === vSel.value || x.name.includes('Google'));
+    if(!targetVoice) targetVoice = synth.getVoices().find(x => x.lang.includes('HK') || x.lang.includes('hk'));
+    if(targetVoice) utter.voice = targetVoice;
+    
+    utter.rate=0.95;
+    utter.onend=()=>{ if(playing){ if(idx===seq.length-1){ speakClosing(); } else { idx++; speak(); } } };
     utter.onerror=()=>{ if(playing){ if(idx===seq.length-1){ speakClosing(); } else { idx++; setTimeout(speak,300); } } };
     synth.speak(utter);
 }
@@ -121,9 +123,8 @@ function speakClosing() {
     tDisp.innerText = P.o.t; xDisp.innerText = P.o.x;
     document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
     utter = new SpeechSynthesisUtterance(P.o.x); utter.lang = 'zh-HK';
-    if(vSel.value && vSel.value !== 'default' && vSel.value !== 'zh-HK'){
-        const voice = synth.getVoices().find(x=>x.name===vSel.value); if(voice) utter.voice = voice;
-    }
+    let targetVoice = synth.getVoices().find(x => x.name === vSel.value || x.name.includes('Google'));
+    if(targetVoice) utter.voice = targetVoice;
     utter.rate=0.95; utter.onend=()=>{ endRosary(); }; utter.onerror=()=>{ endRosary(); };
     synth.speak(utter);
 }
