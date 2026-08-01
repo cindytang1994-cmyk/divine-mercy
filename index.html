@@ -15,12 +15,20 @@
         #display-panel { background:var(--panel); border-radius:15px; padding:25px; width:100%; box-sizing:border-box; text-align:center; margin-bottom:30px; min-height:150px; display:flex; flex-direction:column; justify-content:center; }
         #prayer-title { color:var(--p-gold); font-size:1.4rem; margin:0 0 10px 0; }
         #prayer-text { font-size:1.2rem; line-height:1.6; margin:0; white-space:pre-line; }
-        .rosary-map { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; background:var(--panel); padding:20px; border-radius:15px; width:100%; box-sizing:border-box; }
-        .bead { width:32px; height:32px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:bold; color:#aaa; cursor:pointer; }
-        .bead.cross { width:38px; height:38px; border-radius:8px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; }
-        .bead.large { width:36px; height:36px; background:#2a4d69; border-color:#4b86b4; color:#adcbe3; }
-        .bead.active { background:var(--p-gold)!important; border-color:#fff!important; color:#000!important; animation:pulse 1s infinite alternate; }
-        @keyframes pulse { 0% { transform:scale(1); box-shadow:0 0 5px var(--glow); } 100% { transform:scale(1.15); box-shadow:0 0 20px var(--glow); } }
+        
+        /* 念珠鏈新樣式：流線型串聯 */
+        .rosary-chain { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; background:var(--panel); padding:30px 20px; border-radius:15px; width:100%; box-sizing:border-box; position:relative; }
+        .bead { width:26px; height:26px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:bold; color:#aaa; cursor:pointer; transition:all 0.2s; position:relative; }
+        
+        /* 珠與珠之間的連接線效果 */
+        .bead:not(:last-child)::after { content:''; position:absolute; right:-6px; top:50%; width:6px; height:2px; background:#555; z-index:0; pointer-events:none; }
+        
+        /* 特大十字架樣式 */
+        .bead.cross { width:50px; height:50px; border-radius:10px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:1.6rem; font-weight:normal; box-shadow:0 0 10px rgba(0,0,0,0.6); }
+        .bead.large { width:34px; height:34px; background:#2a4d69; border-color:#4b86b4; color:#adcbe3; font-size:0.75rem; }
+        .bead.active { background:var(--p-gold)!important; border-color:#fff!important; color:#000!important; animation:pulse 0.8s infinite alternate; z-index:2; }
+        
+        @keyframes pulse { 0% { transform:scale(1); box-shadow:0 0 8px var(--glow); } 100% { transform:scale(1.25); box-shadow:0 0 25px var(--glow), 0 0 35px var(--p-gold); } }
         .voice-settings { margin-top:15px; font-size:0.9rem; color:#aaa; }
         select { background:#333; color:#fff; border:1px solid #555; padding:5px 10px; border-radius:5px; }
     </style>
@@ -31,8 +39,8 @@
     <div class="controls"><button id="start-btn">開始誦念</button><button id="pause-btn" disabled>暫停</button><button id="reset-btn">重設</button></div>
     <div id="display-panel"><h2 id="prayer-title">點擊「開始誦念」啟動全自動連續語音功能</h2><p id="prayer-text">本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。</p></div>
     <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="">載入中...</option></select></div>
-    <h3 style="color:var(--p-gold); margin-top:30px; width:100%; text-align:left;">念珠地圖 (54粒圓圈活動念珠與十字架)</h3>
-    <div class="rosary-map" id="beads-container"></div>
+    <h3 style="color:var(--p-gold); margin-top:30px; width:100%; text-align:left;">慈悲串經念珠鏈</h3>
+    <div class="rosary-chain" id="beads-container"></div>
 </div>
 <script>
 const P = {
