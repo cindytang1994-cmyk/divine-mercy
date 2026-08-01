@@ -22,9 +22,9 @@
         /* 十字架 */
         .bead.cross { width:54px; height:54px; border-radius:10px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:1.8rem; z-index:10; }
         
-        /* 藍色珠樣式：維持大珠顏色，但不給編號 */
+        /* 藍色珠樣式：藍色且不顯示任何編號 */
         .bead.blue-style { background:#2a4d69; border-color:#4b86b4; color:#adcbe3; font-size:0rem; }
-        /* 藍色大珠：大珠size，且全劇總共只有 5 粒 */
+        /* 藍色大珠：大珠size，全劇精確保留 5 粒 */
         .bead.large-blue { width:36px; height:36px; }
         /* 藍色小珠：小珠size，用於開端 4 粒 */
         .bead.small-blue { width:22px; height:22px; }
@@ -56,21 +56,17 @@ const P = {
 };
 
 const seq = [];
-// 0: 十字架
 seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x,label:"†"});
-// 1~4: 十字架後頭 4 粒，size為小珠(small-blue)，藍色且不顯示任何數字
 seq.push({id:1,type:"blue-style small-blue",title:P.s.t,text:P.s.x,label:""});
 seq.push({id:2,type:"blue-style small-blue",title:P.p.t,text:P.p.x,label:""});
 seq.push({id:3,type:"blue-style small-blue",title:P.m.t,text:P.m.x,label:""});
 seq.push({id:4,type:"blue-style small-blue",title:P.c.t,text:P.c.x,label:""});
 
-// 5端循環：環狀上總共只有 5 粒藍色大珠(large-blue)，且不顯示任何編號
 for(let d=0;d<5;d++){
     seq.push({id:seq.length,type:"blue-style large-blue",title:`第 ${d+1} 端 · `+P.e.t,text:`(第 ${d+1} 端)\n`+P.e.x,label:""});
     for(let b=0;b<10;b++) seq.push({id:seq.length,type:"small",title:P.h.t,text:`(${b+1}/10)\n`+P.h.x,label:(b+1).toString()});
 }
 
-// 結尾三遍「致聖天主」與最終聖號（最尾不添加大珠，直接無縫附加在經文末端播放）
 let closingPrayers = [
     {title:P.g.t, text:"(第 1 遍)\n" + P.g.x},
     {title:P.g.t, text:"(第 2 遍)\n" + P.g.x},
@@ -110,6 +106,7 @@ function update(){
 function loadV(){
     try {
         let v = synth.getVoices();
+        if(!v || v.length === 0) return;
         let hk = v.filter(x => x.lang.includes('HK') || x.lang.includes('hk') || x.lang.toLowerCase().includes('cantonese') || x.name.includes('Hong Kong'));
         if(hk.length > 0) {
             vSel.innerHTML = '';
@@ -118,8 +115,12 @@ function loadV(){
         }
     } catch(e) { console.error(e); }
 }
+
+// 優先繪製畫面，確保不受語音加載狀態干擾
+render();
+
 if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
-setTimeout(loadV, 400);
+loadV(); setTimeout(loadV, 300); setTimeout(loadV, 800);
 
 function speak(){
     if(idx < 0) return;
@@ -129,8 +130,10 @@ function speak(){
     const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
     let txt=b.text.replace(/\(\d+\/\d+\)/g,'').replace(/\(第\s*\d+\s*[端遍]\)/g,''); utter=new SpeechSynthesisUtterance(txt);
     utter.lang = 'zh-HK';
-    let voice = synth.getVoices().find(x => x.name === vSel.value || x.name.includes('Google'));
-    if(!voice) voice = synth.getVoices().find(x => x.lang.includes('HK') || x.lang.includes('hk'));
+    
+    let voices = synth.getVoices();
+    let voice = voices.find(x => x.name === vSel.value || x.name.includes('Google'));
+    if(!voice) voice = voices.find(x => x.lang.includes('HK') || x.lang.includes('hk'));
     if(voice) utter.voice = voice;
     utter.rate=0.95;
     
@@ -150,7 +153,10 @@ function speakClosingSequence() {
     
     let txt = cp.text.replace(/\(第\s*\d+\s*[端遍]\)/g,'');
     utter = new SpeechSynthesisUtterance(txt); utter.lang = 'zh-HK';
-    let voice = synth.getVoices().find(x => x.name === vSel.value || x.name.includes('Google'));
+    
+    let voices = synth.getVoices();
+    let voice = voices.find(x => x.name === vSel.value || x.name.includes('Google'));
+    if(!voice) voice = voices.find(x => x.lang.includes('HK') || x.lang.includes('hk'));
     if(voice) utter.voice = voice;
     utter.rate=0.95;
     
@@ -163,3 +169,9 @@ function endRosary() { playing=false; btnS.disabled=false; btnP.disabled=true; b
 function jump(i){ idx=i; if(playing) speak(); else { const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update(); } }
 
 btnS.onclick=()=>{ if(!playing){ playing=true; btnS.disabled=true; btnP.disabled=false; btnP.innerText="暫停"; if(idx===-1||idx>=seq.length){ idx=0; closingIdx=0; } speak(); } };
+btnP.onclick=()=>{ if(playing){ playing=false; synth.cancel(); btnP.innerText="繼續"; } else { playing=true; btnP.innerText="暫停"; if(idx>=seq.length){ speakClosingSequence(); } else { speak(); } } };
+btnR.onclick=()=>{ playing=false; synth.cancel(); idx=-1; closingIdx=0; btnS.disabled=false; btnP.disabled=true; btnS.innerText="開始誦念"; btnP.innerText="暫停"; tDisp.innerText="點擊「開始誦念」啟動全自動連續語音功能"; xDisp.innerText="本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。"; document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active')); };
+render();
+</script>
+</body>
+</html>
