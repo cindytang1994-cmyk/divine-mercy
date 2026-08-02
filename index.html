@@ -128,9 +128,17 @@ function speak(){
         synth.cancel();
         if (synth.paused) synth.resume();
         
-        const b = seq[idx];
+                const b = seq[idx];
         tDisp.innerText = b.title;
         xDisp.innerText = b.text;
+        
+        // 補回閃爍跳動圈：先清除所有珠子的發光，再讓當前珠子發光
+        document.querySelectorAll('.bead').forEach(el => el.classList.remove('active'));
+        const currentBeadDOM = document.getElementById(`bead-${b.id || idx}`);
+        if (currentBeadDOM) {
+            currentBeadDOM.classList.add('active');
+        }
+
         
         let txt = b.text.replace(/(\/\d+\d+\d+\d+\/g,"")/, "").replace(/(\/\s*\d+\s*[短通]\s*\/g,"")/, "");
         let cleanText = txt.replace(/（.*）/g, "").replace(/\n/g, "。");
