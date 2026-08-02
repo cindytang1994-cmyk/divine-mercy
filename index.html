@@ -63,7 +63,6 @@
         </div>
     </div>
     
-    <!-- 裝念珠的盒子 -->
     <div class="rosary-layout-container" id="beads-container"></div>
 </div>
 
@@ -72,7 +71,7 @@ const P = {
     s1:{"t":"願主、及子、及聖神之名。","x":"因父、及子、及聖神之名。亞孟。"},
     p1:{"t":"天主經","x":"我們的天父，願您的名受顯揚；願您的國來臨；願您的旨意奉行在人間，如同在天上。求您今天賞給我們日用的食糧；求您寬恕我們的罪過，如同我們寬恕得罪我們的人一樣；不要讓我們陷於誘惑，但救我們免於凶惡。亞孟。"},
     m1:{"t":"聖母經","x":"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚美，妳的胎子耶穌同受讚美。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。亞孟。"},
-    c1:{"t":"信經","x":"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日從死者中復活。祂升天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖相通功。我信罪過的赦免。我信肉身的復活。我信常生。亞孟。"},
+    c1:{"t":"信經","x":"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬.祂下降陰府，第三日從死者中復活。祂升天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖相通功。我信罪過的赦免。我信肉身的復活。我信常生。亞孟。"},
     e1:{"t":"永生之父","x":"永生之父，我們把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及神性奉獻給您，以賠補我們及全世界的罪過。"},
     h1:{"t":"因祂的慘痛苦難","x":"因祂的慘痛苦難，求您垂憐我們及全世界。"},
     g1:{"t":"至聖天主 (結尾三遍)","x":"至聖天主，正義神聖者，全能永生者，求您垂憐我們及全世界。"},
@@ -143,6 +142,7 @@ function updateUI(){
         return;
     }
     
+    // 🎨 精準高亮：無論何時更新介面，都精準抓取相應編號的念珠點亮黃色圈
     if(closingIdx===0 && idx<seq.length){
         const cur = document.getElementById(`b-${idx}`);
         if(cur) cur.classList.add('active');
@@ -162,11 +162,11 @@ function updateUI(){
 }
 
 function speak(){
-    if (idx < 0) return;
+    if (idx < 0 || !playing) return;
     if (idx >= seq.length) { closingIdx = 0; speakClosingSequence(); return; }
     
     const now = Date.now();
-    if (now - lastSpeakTime < 800) return;
+    if (now - lastSpeakTime < 500) return;
     lastSpeakTime = now;
 
     try {
@@ -177,11 +177,11 @@ function speak(){
         tDisp.innerText = b.title;
         xDisp.innerText = b.text;
         
+        // 核心畫面連動：先清除、再精準補上黃色閃光圈
         document.querySelectorAll('.bead').forEach(el => el.classList.remove('active'));
         const cur = document.getElementById(`b-${idx}`);
         if (cur) cur.classList.add('active');
         
-        // 🚀 安全語音清洗：完美過濾數字標記，不引發語音引擎暫停
         let cleanText = b.text.replace(/（.*）/g, "").replace(/\n/g, "。").replace(/\(\d+\/\d+\)/g, "");
         
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -210,16 +210,13 @@ function speak(){
         };
         
         utter.onerror = (e) => {
-            console.log("TTS Error:", e);
             activeUtterance = null;
             if(playing) { idx++; setTimeout(updateUI, 300); }
         };
         
-        // 核心修正：加入 80 毫秒極短物理延時，確保系統完全清空緩衝區後才發聲
-        setTimeout(() => { 
-            if (synth.paused) synth.resume();
-            synth.speak(utter); 
-        }, 80);
+        // 核心修正：去除所有邏輯干擾，使用純物理安全發聲法
+        if (synth.paused) synth.resume();
+        synth.speak(utter);
         
     } catch(e) { console.error(e); }
 }
@@ -227,100 +224,3 @@ function speak(){
 function speakClosingSequence(){
     if (!playing) return;
     if (closingIdx >= closingPrayers.length) { endRosary(); return; }
-    
-    try {
-        if (!synth) synth = window.speechSynthesis;
-        synth.cancel();
-        
-        const cp = closingPrayers[closingIdx];
-        tDisp.innerText = cp.title;
-        xDisp.innerText = cp.text;
-        
-        document.querySelectorAll('.bead').forEach(b => b.classList.remove('active'));
-        
-        let cleanText = cp.text.replace(/（.*）/g, "").replace(/\n/g, "。").replace(/\(\s*第\s*\d+\s*遍\s*\)/g, "");
-        
-        const utter = new SpeechSynthesisUtterance(cleanText);
-        activeUtterance = utter;
-        utter.lang = 'zh-HK';
-        
-        let v = getBestCantoneseVoice();
-        if(v) utter.voice = v;
-        utter.rate = 1.0;
-        
-        utter.onend = () => {
-            activeUtterance = null;
-            if(playing) { closingIdx++; speakClosingSequence(); }
-        };
-        utter.onerror = (e) => {
-            activeUtterance = null;
-            if(playing) { closingIdx++; setTimeout(speakClosingSequence, 300); }
-        };
-        
-        setTimeout(() => { 
-            if (synth.paused) synth.resume();
-            synth.speak(utter); 
-        }, 80);
-        
-    } catch(e) { console.error(e); }
-}
-
-function getBestCantoneseVoice(){
-    if(!synth) return null;
-    const voices = synth.getVoices();
-    // 優先匹配 Google 粵語或本機高質量廣東話女聲
-    return voices.find(v => v.lang === 'zh-HK' && (v.name.includes('Google') || v.name.includes('香港'))) || voices.find(v => v.lang === 'zh-HK' && !v.name.includes('Sunni')) || voices.find(v => v.lang === 'zh-HK');
-}
-
-function loadVoices() {
-    if (!synth) return;
-    const select = document.getElementById('voice-select');
-    if (!select) return;
-    select.innerHTML = '';
-    const voices = synth.getVoices().filter(v => v.lang === 'zh-HK');
-    voices.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v.name;
-        opt.innerText = v.name;
-        select.appendChild(opt);
-    });
-}
-
-function startRosary(){
-    if(playing) return;
-    playing=true;
-    btnS.style.display='none'; btnP.style.display='inline-block';
-    if(idx<0) idx=0;
-    updateUI();
-}
-
-function pauseRosary(){
-    playing=false;
-    if(synth) synth.cancel();
-    btnP.style.display='none'; btnS.style.display='inline-block';
-}
-
-function resetRosary(){
-    playing=false;
-    if(synth) synth.cancel();
-    idx=-1; closingIdx=0;
-    btnP.style.display='none'; btnS.style.display='inline-block';
-    updateUI();
-}
-
-function endRosary(){
-    playing=false; idx=-1; closingIdx=0;
-    btnP.style.display='none'; btnS.style.display='inline-block';
-    updateUI();
-}
-
-if(synth && synth.onvoiceschanged !== undefined){
-    synth.onvoiceschanged = () => { loadVoices(); };
-}
-
-render();
-loadVoices();
-updateUI();
-</script>
-</html>
-
