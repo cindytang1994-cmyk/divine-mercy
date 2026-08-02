@@ -371,3 +371,9 @@ if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefin
         window.speechSynthesis.getVoices();
     };
 }
+btnS.onclick=()=>{ if(!playing){ playing=true; btnS.disabled=true; btnP.disabled=false; btnP.innerText="暫停"; if(idx===-1||idx>=seq.length){ idx=0; closingIdx=0; } speak(); } };
+btnP.onclick=()=>{ if(playing){ playing=false; synth.cancel(); btnP.innerText="繼續"; } else { playing=true; btnP.innerText="暫停"; if(idx>=seq.length){ speakClosingSequence(); } else { speak(); } } };
+btnR.onclick=()=>{ playing=false; synth.cancel(); idx=-1; closingIdx=0; btnS.disabled=false; btnP.disabled=true; btnS.innerText="開始誦念"; btnP.innerText="暫停"; tDisp.innerText="點擊「開始誦念」啟動全自動連續語音功能"; xDisp.innerText="本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。"; document.querySelectorAll('.bead').forEach(b=>b.className=`bead ${seq[b.id].type}`); };
+</script>
+</body>
+</html>
