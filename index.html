@@ -112,23 +112,99 @@ function loadV() {
 if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
 setTimeout(loadV, 300); setTimeout(loadV, 800);
 
+// 全局追蹤變數，防止手機語音被垃圾回收機制釋放
+let activeUtterance = null;
+
 function speak(){
-    if(idx < 0) return; if(idx >= seq.length){ speakClosingSequence(); return; }
-    synth.cancel(); const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
-    let txt=b.text.replace(/\(\d+\/\d+\)/g,'').replace(/\(第\s*\d+\s*[端遍]\)/g,''); utter=new SpeechSynthesisUtterance(txt);
-    utter.lang = 'zh-HK'; let v = getBestCantoneseVoice(); if(v) utter.voice = v; utter.rate = 0.95;
-    utter.onend=()=>{ if(playing){ idx++; speak(); } }; utter.onerror=()=>{ if(playing){ idx++; setTimeout(speak,300); } };
-    synth.speak(utter);
+    if (idx < 0) return;
+    if (idx >= seq.length) { speakClosingSequence(); return; }
+    
+    try {
+        synth.cancel();
+        if (synth.paused) synth.resume(); // 衝破 iOS 暫停 Bug
+        
+        const b = seq[idx];
+        tDisp.innerText = b.title;
+        xDisp.innerText = b.text;
+        
+        let txt = b.text.replace(/(\/\d+\d+\d+\d+\/g,"")/, "").replace(/(\/\s*\d+\s*[短通]\s*\/g,"")/, "");
+        // 移除括號與換行，防手機 Sunni 引擎死機
+        let cleanText = txt.replace(/（.*）/g, "").replace(/\n/g, "。");
+        
+        const utter = new SpeechSynthesisUtterance(cleanText);
+        activeUtterance = utter; // 綁定全域，防背景誤殺
+        
+        utter.lang = 'zh-HK';
+        let v = getBestCantoneseVoice();
+        if(v) utter.voice = v;
+        utter.rate = 0.95; // 稍微放慢語速，給手機系統反應時間
+        
+        utter.onend = () => {
+            activeUtterance = null;
+            if(playing) { idx++; speak(); }
+        };
+        utter.onerror = (e) => {
+            console.log("語音中斷:", e);
+            synth.cancel();
+            activeUtterance = null;
+            if(playing) { idx++; setTimeout(speak, 300); }
+        };
+        
+        // 非同步延遲 50 毫秒觸發，給手機系統換氣時間
+        setTimeout(() => {
+            synth.speak(utter);
+        }, 50);
+        
+    } catch(e) {
+        console.error("語音啟動失敗:", e);
+    }
 }
-function speakClosingSequence() {
-    if(!playing) return; if(closingIdx >= closingPrayers.length){ endRosary(); return; }
-    synth.cancel(); const cp = closingPrayers[closingIdx]; tDisp.innerText = cp.title; xDisp.innerText = cp.text;
-    document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
-    let txt = cp.text.replace(/\(第\s*\d+\s*[端遍]\)/g,''); utter = new SpeechSynthesisUtterance(txt); 
-    utter.lang = 'zh-HK'; let v = getBestCantoneseVoice(); if(v) utter.voice = v; utter.rate = 0.95;
-    utter.onend=()=>{ if(playing){ closingIdx++; speakClosingSequence(); } }; utter.onerror=()=>{ if(playing){ closingIdx++; setTimeout(speakClosingSequence,300); } };
-    synth.speak(utter);
+
+function speakClosingSequence(){
+    if (!playing) return;
+    if (closingIdx >= closingPrayers.length) { endRosary(); return; }
+    
+    try {
+        synth.cancel();
+        if (synth.paused) synth.resume();
+        
+        const cp = closingPrayers[closingIdx];
+        tDisp.innerText = cp.title;
+        xDisp.innerText = cp.text;
+        
+        document.querySelectorAll('.bead').forEach(b => b.classList.remove('active'));
+        
+        let txt = cp.text.replace(/(\/\s*\d+\s*[短通]\s*\/g,"")/, "");
+        let cleanText = txt.replace(/（.*）/g, "").replace(/\n/g, "。");
+        
+        const utter = new SpeechSynthesisUtterance(cleanText);
+        activeUtterance = utter;
+        
+        utter.lang = 'zh-HK';
+        let v = getBestCantoneseVoice();
+        if(v) utter.voice = v;
+        utter.rate = 0.95;
+        
+        utter.onend = () => {
+            activeUtterance = null;
+            if(playing) { closingIdx++; speakClosingSequence(); }
+        };
+        utter.onerror = (e) => {
+            console.log("結尾語音中斷:", e);
+            synth.cancel();
+            activeUtterance = null;
+            if(playing) { closingIdx++; setTimeout(speakClosingSequence, 300); }
+        };
+        
+        setTimeout(() => {
+            synth.speak(utter);
+        }, 50);
+        
+    } catch(e) {
+        console.error("結尾語音啟動失敗:", e);
+    }
 }
+
 function endRosary() { playing=false; btnS.disabled=false; btnP.disabled=true; btnS.innerText="重新開始"; closingIdx=0; }
 function jump(i){ idx=i; if(playing) speak(); else { const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update(); } }
 
