@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>慈悲串經互動朗讀版 - divine-mercy</title>
     <style>
         :root { --p-gold: #d4af37; --bg: #121212; --panel: #1e1e1e; --txt: #f0f0f0; --glow: rgba(212,175,55,0.8); }
@@ -59,6 +60,7 @@ let closingPrayers = [{title:P.g.t, text:"(第 1 遍)\n" + P.g.x},{title:P.g.t, 
 let idx=-1, playing=false, synth=window.speechSynthesis, utter=null, closingIdx=0;
 const startBtn=document.getElementById('start-btn'), pauseBtn=document.getElementById('pause-btn'), resetBtn=document.getElementById('reset-btn');
 const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container'), vSel=document.getElementById('voice-select');
+
 function render(){
     box.innerHTML=''; const centerX = 190, centerY = 190; const crossY = 440, paterY = 380, aveY = 335, credoY = 290;
     seq.forEach((b,i)=>{
@@ -70,8 +72,13 @@ function render(){
         el.style.left = `${posX}px`; el.style.top = `${posY}px`; el.onclick=()=>{ if(playing) { playing=false; synth.cancel(); } closingIdx=0; jump(i); }; box.appendChild(el);
     });
 }
-function update(){ document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); }else b.className=`bead ${seq[i].type}`; }); }
+function update(){ 
+    document.querySelectorAll('.bead').forEach((b,i)=>{ 
+        if(i===idx){ b.classList.add('active'); } else { b.className=`bead ${seq[i].type}`; } 
+    }); 
+}
 render();
+
 function getBestCantoneseVoice() {
     try {
         let voices = synth.getVoices(); let target = voices.find(x => x.name.includes('Google') && (x.lang.includes('HK') || x.lang.includes('hk')));
@@ -86,6 +93,7 @@ function loadV() {
 }
 if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
 setTimeout(loadV, 300); setTimeout(loadV, 800);
+
 function optimizeTextForVoice(rawText, voiceObj) {
     let clean = rawText.replace(/\(\d+\/\d+\)/g, '').replace(/\(第\s*\d+\s*[端遍]\)/g, ''); let voiceName = voiceObj ? voiceObj.name : "";
     clean = clean.replace(/妳的/g, "祢的").replace(/妳/g, "祢");
@@ -106,6 +114,9 @@ function speak(){
     utter.onerror=(e)=>{ console.log("TTS Loop Guard", e); if(playing){ setTimeout(speak, 400); } };
     synth.speak(utter);
 }
+if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
+setTimeout(loadV, 300); setTimeout(loadV, 800);
+
 function speakClosingSequence() {
     if(!playing) return; if(closingIdx >= closingPrayers.length){ endRosary(); return; }
     synth.cancel(); const cp = closingPrayers[closingIdx]; tDisp.innerText = cp.title; xDisp.innerText = cp.text; document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
@@ -115,10 +126,6 @@ function speakClosingSequence() {
     utter.onerror=()=>{ if(playing){ setTimeout(speakClosingSequence, 400); } };
     synth.speak(utter);
 }
-function endRosary() { playing=false; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="重新開始"; closingIdx=0; }
-function jump(i){ idx=i; const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update(); }
-
-startBtn.onclick = () => {
 startBtn.onclick = () => {
     if (!playing) {
         playing = true;
@@ -160,7 +167,7 @@ resetBtn.onclick = () => {
     pauseBtn.innerText = "暫停";
     tDisp.innerText = "點擊「開始誦念」啟動全自動連續語音功能";
     xDisp.innerText = "本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。";
-    document.querySelectorAll('.bead').forEach(b => b.className = `bead ${seq[b.id].type}`);
+    document.querySelectorAll('.bead').forEach(b => { b.className = `bead ${seq[b.id].type}`; });
 };
 </script>
 </body>
