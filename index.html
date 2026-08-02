@@ -5,43 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>慈悲串經互動朗讀版 - divine-mercy</title>
     <style>
-        :root {
-            --p-gold: #d4af37;
-            --bg: #121212;
-            --panel: #1a1a1a;
-            --text: #f0f0f0;
-            --glow: rgba(212,175,55,0.6);
-        }
-        body {
-            margin: 0; padding: 0;
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-        }
-        header { text-align: center; padding: 20px; background: var(--panel); width: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        h1 { margin: 0; color: var(--p-gold); font-size: 1.8rem; }
-        .container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 800px; padding: 20px; box-sizing: border-box; }
-        .controls { margin-bottom: 20px; display: flex; gap: 15px; }
-        button { background: var(--p-gold); color: #000; border: none; padding: 12px 24px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        button:disabled { background: #555; color: #888; cursor: not-allowed; }
-        #display-panel { background: var(--panel); border-radius: 15px; padding: 25px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; }
-        #prayer-title { color: var(--p-gold); font-size: 1.4rem; margin: 0 0 10px 0; }
-        #prayer-text { font-size: 1.2rem; line-height: 1.6; margin: 0; white-space: pre-line; }
-        .rosary-layout-container { position: relative; width: 380px; height: 480px; margin: 20px auto; }
-        .bead { position: absolute; width: 22px; height: 22px; border-radius: 50%; background: #444; border: 2px solid #666; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #fff; cursor: pointer; transform: translate(-50%,-50%); box-shadow: inset -2px -2px 5px rgba(0,0,0,0.5); transition: all 0.2s; }
-        .bead.cross { width: 34px; height: 34px; border-radius: 10px; background: #5a4a3a; border-color: #8b7355; color: var(--p-gold); font-size: 1.3rem; }
-        .bead.blue-style { background: #2a4d69; border-color: #4b86b4; color: #adcbe3; font-size: 0rem; }
-        .bead.large-blue { width: 36px; height: 36px; }
+        :root { --p-gold: #d4af37; --bg: #121212; --panel: #1a1a1a; --text: #f0f0f0; }
+        body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text); font-family: sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        header { text-align: center; padding: 15px; background: var(--panel); width: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        h1 { margin: 0; color: var(--p-gold); font-size: 1.6rem; }
+        .container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px; padding: 15px; box-sizing: border-box; }
+        .controls { margin-bottom: 15px; display: flex; gap: 10px; }
+        button { background: var(--p-gold); color: #000; border: none; padding: 10px 20px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        #display-panel { background: var(--panel); border-radius: 12px; padding: 20px; width: 100%; box-sizing: border-box; text-align: center; margin-bottom: 15px; }
+        #prayer-title { color: var(--p-gold); font-size: 1.25rem; margin: 0 0 8px 0; }
+        #prayer-text { font-size: 1.1rem; line-height: 1.5; margin: 0; white-space: pre-line; }
+        .rosary-layout-container { position: relative; width: 380px; height: 480px; margin: 15px auto; }
+        .bead { position: absolute; width: 22px; height: 22px; border-radius: 50%; background: #444; border: 2px solid #666; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #fff; cursor: pointer; transform: translate(-50%,-50%); transition: all 0.2s; }
+        .bead.cross { width: 34px; height: 34px; border-radius: 8px; background: #5a4a3a; border-color: #8b7355; color: var(--p-gold); font-size: 1.2rem; }
+        .bead.blue-style { background: #2a4d69; border-color: #4b86b4; font-size: 0rem; }
+        .bead.large-blue { width: 34px; height: 34px; }
         .bead.small-blue { width: 22px; height: 22px; }
-        .bead.active { background: var(--p-gold) !important; border-color: #fff !important; color: #000 !important; font-size: 11px !important; animation: pulse 1.5s infinite alternate; box-shadow: 0 0 20px var(--p-gold); }
-        @keyframes pulse { 0% { transform: translate(-50%,-50%) scale(1); } 100% { transform: translate(-50%,-50%) scale(1.2); } }
-        .voice-settings { margin-top: 15px; font-size: 0.9rem; color: #aaa; }
-        select { background: #333; color: #fff; border: 1px solid #555; padding: 5px 10px; border-radius: 5px; }
+        .bead.active { background: var(--p-gold) !important; border-color: #fff !important; color: #000 !important; font-size: 11px !important; animation: pulse 1.5s infinite alternate; box-shadow: 0 0 15px var(--p-gold); }
+        @keyframes pulse { 0% { transform: translate(-50%,-50%) scale(1); } 100% { transform: translate(-50%,-50%) scale(1.15); } }
+        .voice-settings { margin-top: 10px; font-size: 0.85rem; color: #aaa; }
+        select { background: #333; color: #fff; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -82,42 +65,32 @@ for(let d=0;d<5;d++){
     }
 }
 const closingPrayers = [
-    {title:P.g1.t, text:"(第 1 遍)\n" + P.g1.x},
-    {title:P.g1.t, text:"(第 2 遍)\n" + P.g1.x},
-    {title:P.g1.t, text:"(第 3 遍)\n" + P.g1.x},
-    {title:P.o1.t, text:P.o1.x}
+    {title:P.g1.t, text:"(第 1 遍)\n" + P.g1.x}, {title:P.g1.t, text:"(第 2 遍)\n" + P.g1.x},
+    {title:P.g1.t, text:"(第 3 遍)\n" + P.g1.x}, {title:P.o1.t, text:P.o1.x}
 ];
 const btnS=document.getElementById('start-btn'), btnP=document.getElementById('pause-btn'), btnR=document.getElementById('reset-btn');
 const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container');
+
 function render(){
     box.innerHTML='';
-    const centerX = 190, centerY = 190;
-    const crossY = 440, paterY = 380, aveY = 335, credoY = 290;
+    const centerX = 190, centerY = 190, crossY = 440, paterY = 380, aveY = 335, credoY = 290;
     seq.forEach((b,i)=>{
         const d = document.createElement('div');
-        d.className=`bead ${b.type}`;
-        d.innerText=b.label;
-        d.id=`b-${i}`;
+        d.className=`bead ${b.type}`; d.innerText=b.label; d.id=`b-${i}`;
         if(i===0){ d.style.left=`${centerX}px`; d.style.top=`${crossY}px`; }
         else if(i===1){ d.style.left=`${centerX}px`; d.style.top=`${paterY}px`; }
         else if(i===2){ d.style.left=`${centerX}px`; d.style.top=`${aveY}px`; }
         else if(i===3){ d.style.left=`${centerX}px`; d.style.top=`${credoY}px`; }
         else {
-            const rIdx = i - 4;
-            const ringCount = 55;
-            const angle = (Math.PI/2) - (rIdx/ringCount)*Math.PI*2;
-            const rx = 120, ry = 100;
-            d.style.left=`${centerX + rx*Math.cos(angle)}px`;
-            d.style.top=`${centerY + ry*Math.sin(angle)}px`;
+            const rIdx = i - 4, ringCount = 55, angle = (Math.PI/2) - (rIdx/ringCount)*Math.PI*2, rx = 120, ry = 100;
+            d.style.left=`${centerX + rx*Math.cos(angle)}px`; d.style.top=`${centerY + ry*Math.sin(angle)}px`;
         }
         d.onclick=()=>{ if(!playing){ idx=i; closingIdx=0; updateUI(); } };
         box.appendChild(d);
     });
 }
 
-let idx=-1, playing=false, synth=window.speechSynthesis, closingIdx=0;
-let activeUtterance = null;
-let lastSpeakTime = 0;
+let idx=-1, playing=false, synth=window.speechSynthesis, closingIdx=0, activeUtterance = null, lastSpeakTime = 0;
 
 function updateUI(){
     document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
@@ -130,16 +103,10 @@ function updateUI(){
         const cur = document.getElementById(`b-${idx}`);
         if(cur) cur.classList.add('active');
     }
-    if(playing) {
-        if(closingIdx>0){ speakClosingSequence(); } else { speak(); }
-    } else {
-        if(closingIdx>0){
-            const cp=closingPrayers[closingIdx-1];
-            tDisp.innerText=cp.title; xDisp.innerText=cp.text;
-        } else {
-            const b=seq[idx];
-            tDisp.innerText=b.title; xDisp.innerText=b.text;
-        }
+    if(playing) { if(closingIdx>0){ speakClosingSequence(); } else { speak(); } } 
+    else {
+        if(closingIdx>0){ const cp=closingPrayers[closingIdx-1]; tDisp.innerText=cp.title; xDisp.innerText=cp.text; } 
+        else { const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; }
     }
 }
 
@@ -152,38 +119,25 @@ function speak(){
     try {
         if (!synth) synth = window.speechSynthesis;
         synth.cancel();
-        const b = seq[idx];
-        tDisp.innerText = b.title;
-        xDisp.innerText = b.text;
+        const b = seq[idx]; tDisp.innerText = b.title; xDisp.innerText = b.text;
         document.querySelectorAll('.bead').forEach(el => el.classList.remove('active'));
-        const cur = document.getElementById(`b-${idx}`);
-        if (cur) cur.classList.add('active');
-        let txt = b.text;
-        let cleanText = txt.replace(/（.*）/g, "").replace(/\n/g, "。").replace(/\(\d+\/\d+\)/g, "");
+        const cur = document.getElementById(`b-${idx}`); if (cur) cur.classList.add('active');
+        let txt = b.text, cleanText = txt.replace(/（.*）/g, "").replace(/\n/g, "。").replace(/\(\d+\/\d+\)/g, "");
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
         if (isIOS && (b.type === "small" || !cleanText.trim() || !isNaN(cleanText.trim()))) {
             cleanText = "因祂的慘痛苦難，求您垂憐我們及全世界。";
         }
-        const utter = new SpeechSynthesisUtterance(cleanText);
-        activeUtterance = utter;
-        utter.lang = 'zh-HK';
-        let v = getBestCantoneseVoice();
-        if(v) utter.voice = v;
-        utter.rate = isIOS ? 0.95 : 1.0; 
+        const utter = new SpeechSynthesisUtterance(cleanText); activeUtterance = utter; utter.lang = 'zh-HK';
+        let v = getBestCantoneseVoice(); if(v) utter.voice = v; utter.rate = isIOS ? 0.95 : 1.0; 
         utter.onend = () => {
             activeUtterance = null;
             if(playing) {
                 if (window.nextBeadTimeout) clearTimeout(window.nextBeadTimeout);
                 let delayTime = isIOS ? 2200 : 300; 
-                window.nextBeadTimeout = setTimeout(() => {
-                    if (playing) { idx++; updateUI(); }
-                }, delayTime);
+                window.nextBeadTimeout = setTimeout(() => { if (playing) { idx++; updateUI(); } }, delayTime);
             }
         };
-        utter.onerror = (e) => {
-            activeUtterance = null;
-            if(playing) { idx++; setTimeout(updateUI, 300); }
-        };
+        utter.onerror = () => { activeUtterance = null; if(playing) { idx++; setTimeout(updateUI, 300); } };
         if (synth.paused) synth.resume();
         synth.speak(utter);
     } catch(e) { console.error(e); }
@@ -195,25 +149,13 @@ function speakClosingSequence(){
     try {
         if (!synth) synth = window.speechSynthesis;
         synth.cancel();
-        const cp = closingPrayers[closingIdx];
-        tDisp.innerText = cp.title;
-        xDisp.innerText = cp.text;
+        const cp = closingPrayers[closingIdx]; tDisp.innerText = cp.title; xDisp.innerText = cp.text;
         document.querySelectorAll('.bead').forEach(b => b.classList.remove('active'));
         let cleanText = cp.text.replace(/（.*）/g, "").replace(/\n/g, "。").replace(/\(\s*第\s*\d+\s*遍\s*\)/g, "");
-        const utter = new SpeechSynthesisUtterance(cleanText);
-        activeUtterance = utter;
-        utter.lang = 'zh-HK';
-        let v = getBestCantoneseVoice();
-        if(v) utter.voice = v;
-        utter.rate = 1.0;
-        utter.onend = () => {
-            activeUtterance = null;
-            if(playing) { closingIdx++; speakClosingSequence(); }
-        };
-        utter.onerror = (e) => {
-            activeUtterance = null;
-            if(playing) { closingIdx++; setTimeout(speakClosingSequence, 300); }
-        };
+        const utter = new SpeechSynthesisUtterance(cleanText); activeUtterance = utter; utter.lang = 'zh-HK';
+        let v = getBestCantoneseVoice(); if(v) utter.voice = v; utter.rate = 1.0;
+        utter.onend = () => { activeUtterance = null; if(playing) { closingIdx++; speakClosingSequence(); } };
+        utter.onerror = () => { activeUtterance = null; if(playing) { closingIdx++; setTimeout(speakClosingSequence, 300); } };
         if (synth.paused) synth.resume();
         synth.speak(utter);
     } catch(e) { console.error(e); }
@@ -227,49 +169,18 @@ function getBestCantoneseVoice(){
 
 function loadVoices() {
     if (!synth) return;
-    const select = document.getElementById('voice-select');
-    if (!select) return;
+    const select = document.getElementById('voice-select'); if (!select) return;
     select.innerHTML = '';
-    const voices = synth.getVoices().filter(v => v.lang === 'zh-HK');
-    voices.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v.name;
-        opt.innerText = v.name;
-        select.appendChild(opt);
+    synth.getVoices().filter(v => v.lang === 'zh-HK').forEach(v => {
+        const opt = document.createElement('option'); opt.value = v.name; opt.innerText = v.name; select.appendChild(opt);
     });
 }
+function startRosary(){ if(playing) return; playing=true; btnS.style.display='none'; btnP.style.display='inline-block'; if(idx<0) idx=0; speak(); }
+function pauseRosary(){ playing=false; if(synth) synth.cancel(); btnP.style.display='none'; btnS.style.display='inline-block'; }
+function resetRosary(){ playing=false; if(synth) synth.cancel(); idx=-1; closingIdx=0; btnP.style.display='none'; btnS.style.display='inline-block'; updateUI(); }
+function endRosary(){ playing=false; idx=-1; closingIdx=0; btnP.style.display='none'; btnS.style.display='inline-block'; updateUI(); }
 
-function startRosary(){
-    if(playing) return;
-    playing=true;
-    btnS.style.display='none'; btnP.style.display='inline-block';
-    if(idx<0) idx=0;
-    speak(); 
-}
-
-function pauseRosary(){
-    playing=false;
-    if(synth) synth.cancel();
-    btnP.style.display='none'; btnS.style.display='inline-block';
-}
-
-function resetRosary(){
-    playing=false;
-    if(synth) synth.cancel();
-    idx=-1; closingIdx=0;
-    btnP.style.display='none'; btnS.style.display='inline-block';
-    updateUI();
-}
-
-function endRosary(){
-    playing=false; idx=-1; closingIdx=0;
-    btnP.style.display='none'; btnS.style.display='inline-block';
-    updateUI();
-}
-
-if(synth && synth.onvoiceschanged !== undefined){
-    synth.onvoiceschanged = () => { loadVoices(); };
-}
+if(synth && synth.onvoiceschanged !== undefined){ synth.onvoiceschanged = () => { loadVoices(); }; }
 
 render();
 loadVoices();
