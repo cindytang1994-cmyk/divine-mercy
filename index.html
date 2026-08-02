@@ -86,21 +86,16 @@ function loadV() {
 }
 if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
 setTimeout(loadV, 300); setTimeout(loadV, 800);
-
 function optimizeTextForVoice(rawText, voiceObj) {
     let clean = rawText.replace(/\(\d+\/\d+\)/g, '').replace(/\(第\s*\d+\s*[端遍]\)/g, ''); let voiceName = voiceObj ? voiceObj.name : "";
     clean = clean.replace(/妳的/g, "祢的").replace(/妳/g, "祢");
-    
     if (voiceName.includes("Google") || vSel.value.includes("Google")) { 
-        clean = clean.replace(/聖神/g, "聖臣"); 
-        // 修正第一粒小珠及後續的 Google 語音卡死錯誤
-        clean = clean.replace(/垂憐/g, "誰憐").replace(/及普世/g, "同普世");
+        clean = clean.replace(/聖神/g, "聖臣").replace(/垂憐/g, "誰憐").replace(/及普世/g, "同普世"); 
     } else if (voiceName.includes("Sinji") || voiceName.includes("Apple") || (!voiceName && /iPhone|iPad|Macintosh/i.test(navigator.userAgent))) { 
         clean = clean.replace(/亞孟/g, "呀免"); 
     }
     return clean;
 }
-
 function speak(){
     if(!playing || idx < 0) return;
     if(idx >= seq.length){ speakClosingSequence(); return; }
@@ -121,6 +116,9 @@ function speakClosingSequence() {
     synth.speak(utter);
 }
 function endRosary() { playing=false; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="重新開始"; closingIdx=0; }
+function jump(i){ idx=i; const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update(); }
+
+startBtn.onclick = () => {
 startBtn.onclick = () => {
     if (!playing) {
         playing = true;
