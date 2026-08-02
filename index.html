@@ -40,102 +40,70 @@ const P = {
     s:{t:"因父、及子、及聖神之名",x:"因父、及子、及聖神之名。亞孟。"},
     p:{t:"天主經",x:"我們的天父，願祢的名受顯揚；願祢的國來臨；願祢的旨意奉行在人間，如同在天上。求祢今天賞給我們日用的食糧；求祢寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑；但救我們免於凶惡。亞孟。"},
     m:{t:"聖母經",x:"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。亞孟。"},
-    c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者. 我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。亞孟。"},
+    c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。亞孟。"},
     e:{t:"永生之父",x:"永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。"},
     h:{t:"因祂的至悲慘苦難",x:"因祂的至悲慘苦難，求您垂憐我們及普世。"},
     g:{t:"至聖天主 (結尾三遍)",x:"至聖天主，至聖強有力者，致聖長存者，求您垂憐我們及普世。"},
     o:{t:"主耶穌，慈悲的君王，我們信賴祢！",x:"主耶穌，慈悲的君王，我們信賴祢！\n\n因父、及子及聖神之名。亞孟。"}
 };
-
 const seq = [];
-// 0: 十字架，1~3: 向上接續的 3 粒藍色圓珠（小珠 size 且留白無數字）
 seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x,label:"†"});
 seq.push({id:1,type:"blue-style small-blue",title:P.p.t,text:P.p.x,label:""});
 seq.push({id:2,type:"blue-style small-blue",title:P.m.t,text:P.m.x,label:""});
 seq.push({id:3,type:"blue-style small-blue",title:P.c.t,text:P.c.x,label:""});
-
 for(let d=0;d<5;d++){
     seq.push({id:seq.length,type:"blue-style large-blue",title:`第 ${d+1} 端 · `+P.e.t,text:`(第 ${d+1} 端)\n`+P.e.x,label:""});
     for(let b=0;b<10;b++) seq.push({id:seq.length,type:"small",title:P.h.t,text:`(${b+1}/10)\n`+P.h.x,label:(b+1).toString()});
 }
-
 let closingPrayers = [{title:P.g.t, text:"(第 1 遍)\n" + P.g.x},{title:P.g.t, text:"(第 2 遍)\n" + P.g.x},{title:P.g.t, text:"(第 3 遍)\n" + P.g.x},{title:P.o.t, text:P.o.x}];
 let idx=-1, playing=false, synth=window.speechSynthesis, utter=null, closingIdx=0;
 const btnS=document.getElementById('start-btn'), btnP=document.getElementById('pause-btn'), btnR=document.getElementById('reset-btn');
 const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container'), vSel=document.getElementById('voice-select');
-
 function render(){
-    box.innerHTML=''; const centerX = 190, centerY = 190;
-    const crossY = 440, paterY = 380, aveY = 335, credoY = 290;
-
+    box.innerHTML=''; const centerX = 190, centerY = 190; const crossY = 440, paterY = 380, aveY = 335, credoY = 290;
     seq.forEach((b,i)=>{
-        const el=document.createElement('div'); el.className=`bead ${b.type}`; el.innerHTML=b.label;
-        let posX = centerX, posY = crossY;
-        if(i === 0) { posX = centerX; posY = crossY; }
-        else if(i === 1) { posX = centerX; posY = paterY; }
-        else if(i === 2) { posX = centerX; posY = aveY; }
-        else if(i === 3) { posX = centerX; posY = credoY; }
-        else {
-            const ringIndex = i - 4; const totalRingBeads = seq.length - 4;
-            const angle = (ringIndex / totalRingBeads) * 2 * Math.PI + Math.PI / 2;
-            const radiusX = 145 * Math.cos(angle); const radiusY = 115 * Math.sin(angle) * (1 - 0.22 * Math.sin(angle));
-            posX = centerX + radiusX; posY = centerY - 35 + radiusY;
+        const el=document.createElement('div'); el.className=`bead ${b.type}`; el.innerHTML=b.label; let posX = centerX, posY = crossY;
+        if(i === 0) { posX = centerX; posY = crossY; } else if(i === 1) { posX = centerX; posY = paterY; } else if(i === 2) { posX = centerX; posY = aveY; } else if(i === 3) { posX = centerX; posY = credoY; } else {
+            const ringIndex = i - 4; const totalRingBeads = seq.length - 4; const angle = (ringIndex / totalRingBeads) * 2 * Math.PI + Math.PI / 2;
+            const radiusX = 145 * Math.cos(angle); const radiusY = 115 * Math.sin(angle) * (1 - 0.22 * Math.sin(angle)); posX = centerX + radiusX; posY = centerY - 35 + radiusY;
         }
-        el.style.left = `${posX}px`; el.style.top = `${posY}px`;
-        el.onclick=()=>{ if(playing) synth.cancel(); closingIdx=0; jump(i); }; box.appendChild(el);
+        el.style.left = `${posX}px`; el.style.top = `${posY}px`; el.onclick=()=>{ if(playing) synth.cancel(); closingIdx=0; jump(i); }; box.appendChild(el);
     });
 }
-function update(){
-    document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); }else b.className=`bead ${seq[i].type}`; });
-}
-
+function update(){ document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); }else b.className=`bead ${seq[i].type}`; }); }
 render();
-
 function getBestCantoneseVoice() {
     try {
-        let voices = synth.getVoices();
-        let target = voices.find(x => x.name.includes('Google') && (x.lang.includes('HK') || x.lang.includes('hk')));
-        if(!target) target = voices.find(x => x.lang.includes('HK') || x.lang.includes('hk') || x.lang.toLowerCase().includes('cantonese'));
-        return target;
+        let voices = synth.getVoices(); let target = voices.find(x => x.name.includes('Google') && (x.lang.includes('HK') || x.lang.includes('hk')));
+        if(!target) target = voices.find(x => x.lang.includes('HK') || x.lang.includes('hk') || x.lang.toLowerCase().includes('cantonese')); return target;
     } catch(e) { return null; }
 }
 function loadV() {
     try {
-        let v = synth.getVoices(); if(!v || v.length === 0) return;
-        let hk = v.filter(x => x.lang.includes('HK') || x.lang.includes('hk') || x.lang.toLowerCase().includes('cantonese') || x.name.includes('Hong Kong'));
-        if(hk.length > 0) {
-            vSel.innerHTML = ''; hk.sort((a,b) => b.name.includes('Google') - a.name.includes('Google'));
-            hk.forEach(x => { const o = document.createElement('option'); o.value = x.name; o.innerText = `廣東話 - ${x.name}`; if(x.name.includes('Google')) o.selected = true; vSel.appendChild(o); });
-        }
+        let v = synth.getVoices(); if(!v || v.length === 0) return; let hk = v.filter(x => x.lang.includes('HK') || x.lang.includes('hk') || x.lang.toLowerCase().includes('cantonese') || x.name.includes('Hong Kong'));
+        if(hk.length > 0) { vSel.innerHTML = ''; hk.sort((a,b) => b.name.includes('Google') - a.name.includes('Google')); hk.forEach(x => { const o = document.createElement('option'); o.value = x.name; o.innerText = `廣東話 - ${x.name}`; if(x.name.includes('Google')) o.selected = true; vSel.appendChild(o); }); }
     } catch(e) {}
 }
 if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
 setTimeout(loadV, 300); setTimeout(loadV, 800);
-
 function speak(){
     if(idx < 0) return; if(idx >= seq.length){ speakClosingSequence(); return; }
     synth.cancel(); const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
     let txt=b.text.replace(/\(\d+\/\d+\)/g,'').replace(/\(第\s*\d+\s*[端遍]\)/g,''); utter=new SpeechSynthesisUtterance(txt);
     utter.lang = 'zh-HK'; let v = getBestCantoneseVoice(); if(v) utter.voice = v; utter.rate = 0.95;
-    utter.onend=()=>{ if(playing){ idx++; speak(); } }; utter.onerror=()=>{ if(playing){ idx++; setTimeout(speak,300); } };
-    synth.speak(utter);
+    utter.onend=()=>{ if(playing){ idx++; speak(); } }; utter.onerror=()=>{ if(playing){ idx++; setTimeout(speak,300); } }; synth.speak(utter);
 }
 function speakClosingSequence() {
     if(!playing) return; if(closingIdx >= closingPrayers.length){ endRosary(); return; }
-    synth.cancel(); const cp = closingPrayers[closingIdx]; tDisp.innerText = cp.title; xDisp.innerText = cp.text;
-    document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
-    let txt = cp.text.replace(/\(第\s*\d+\s*[端遍]\)/g,''); utter = new SpeechSynthesisUtterance(txt); 
-    utter.lang = 'zh-HK'; let v = getBestCantoneseVoice(); if(v) utter.voice = v; utter.rate = 0.95;
-    utter.onend=()=>{ if(playing){ closingIdx++; speakClosingSequence(); } }; utter.onerror=()=>{ if(playing){ closingIdx++; setTimeout(speakClosingSequence,300); } };
-    synth.speak(utter);
+    synth.cancel(); const cp = closingPrayers[closingIdx]; tDisp.innerText = cp.title; xDisp.innerText = cp.text; document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
+    let txt = cp.text.replace(/\(第\s*\d+\s*[端遍]\)/g,''); utter = new SpeechSynthesisUtterance(txt); utter.lang = 'zh-HK'; let v = getBestCantoneseVoice(); if(v) utter.voice = v; utter.rate = 0.95;
+    utter.onend=()=>{ if(playing){ closingIdx++; speakClosingSequence(); } }; utter.onerror=()=>{ if(playing){ closingIdx++; setTimeout(speakClosingSequence,300); } }; synth.speak(utter);
 }
 function endRosary() { playing=false; btnS.disabled=false; btnP.disabled=true; btnS.innerText="重新開始"; closingIdx=0; }
 function jump(i){ idx=i; if(playing) speak(); else { const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update(); } }
-
 btnS.onclick=()=>{ if(!playing){ playing=true; btnS.disabled=true; btnP.disabled=false; btnP.innerText="暫停"; if(idx===-1||idx>=seq.length){ idx=0; closingIdx=0; } speak(); } };
 btnP.onclick=()=>{ if(playing){ playing=false; synth.cancel(); btnP.innerText="繼續"; } else { playing=true; btnP.innerText="暫停"; if(idx>=seq.length){ speakClosingSequence(); } else { speak(); } } };
 btnR.onclick=()=>{ playing=false; synth.cancel(); idx=-1; closingIdx=0; btnS.disabled=false; btnP.disabled=true; btnS.innerText="開始誦念"; btnP.innerText="暫停"; tDisp.innerText="點擊「開始誦念」啟動全自動連續語音功能"; xDisp.innerText="本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。"; document.querySelectorAll('.bead').forEach(b=>b.className=`bead ${seq[b.id].type}`); };
-render();
 </script>
 </body>
 </html>
