@@ -112,52 +112,81 @@ function loadV() {
 if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
 setTimeout(loadV, 300); setTimeout(loadV, 800);
 
-// 全局追蹤變數，防止手機語音被垃圾回收機制釋放
 let activeUtterance = null;
+let lastSpeakTime = 0;
 
 function speak(){
     if (idx < 0) return;
     if (idx >= seq.length) { speakClosingSequence(); return; }
     
+    // 智慧防連跳：防止任何裝置在 1 秒內重複觸發
+    const now = Date.now();
+    if (now - lastSpeakTime < 1000) { return; }
+    lastSpeakTime = now;
+
     try {
         synth.cancel();
-        if (synth.paused) synth.resume(); // 衝破 iOS 暫停 Bug
+        if (synth.paused) synth.resume();
         
         const b = seq[idx];
         tDisp.innerText = b.title;
         xDisp.innerText = b.text;
         
         let txt = b.text.replace(/(\/\d+\d+\d+\d+\/g,"")/, "").replace(/(\/\s*\d+\s*[短通]\s*\/g,"")/, "");
-        // 移除括號與換行，防手機 Sunni 引擎死機
         let cleanText = txt.replace(/（.*）/g, "").replace(/\n/g, "。");
         
+        // 偵測當前是不是 Apple 裝置 (iPhone/iPad)
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        // 如果是 iPhone，且文字被過濾到只剩數字，強制塞回完整經文防止 Sinji 只讀數字
+        if (isIOS && (!cleanText.trim() || !isNaN(cleanText.trim()) || cleanText.length <= 2)) {
+            cleanText = "因祂的慘痛苦難，求您垂憐我們及全世界。";
+        }
+
         const utter = new SpeechSynthesisUtterance(cleanText);
-        activeUtterance = utter; // 綁定全域，防背景誤殺
+        activeUtterance = utter;
         
         utter.lang = 'zh-HK';
         let v = getBestCantoneseVoice();
         if(v) utter.voice = v;
-        utter.rate = 0.95; // 稍微放慢語速，給手機系統反應時間
         
+        utter.rate = isIOS ? 0.95 : 1.0; // iPhone 稍微放慢確保穩定，其他裝置正常語速
+        utter.pitch = 1.0;
+        
+        // 核心智慧分流監聽
         utter.onend = () => {
             activeUtterance = null;
-            if(playing) { idx++; speak(); }
+            if(playing) {
+                if (window.nextBeadTimeout) clearTimeout(window.nextBeadTimeout);
+                
+                // 如果是 iPhone，強制留白延遲 2 秒換氣才跳下一珠；安桌或電腦則 0.3 秒無縫順讀
+                let delayTime = isIOS ? 2000 : 300; 
+                
+                window.nextBeadTimeout = setTimeout(() => {
+                    if (playing) { idx++; speak(); }
+                }, delayTime);
+            }
         };
+
         utter.onerror = (e) => {
-            console.log("語音中斷:", e);
+            console.log("語音出錯:", e);
             synth.cancel();
             activeUtterance = null;
-            if(playing) { idx++; setTimeout(speak, 300); }
+            if(playing) {
+                idx++;
+                setTimeout(speak, 1000);
+            }
         };
         
-        // 非同步延遲 50 毫秒觸發，給手機系統換氣時間
         setTimeout(() => {
             synth.speak(utter);
-        }, 50);
+        }, 100);
         
     } catch(e) {
-        console.error("語音啟動失敗:", e);
+        console.error("語音失敗:", e);
     }
+}
+
 }
 
 function speakClosingSequence(){
