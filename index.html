@@ -19,17 +19,14 @@
         .voice-settings { margin-top:15px; margin-bottom:70px; font-size:0.9rem; color:#aaa; text-align: center; }
         select { background:#333; color:#fff; border:1px solid #555; padding:5px 10px; border-radius:5px; margin-left: 5px; }
         
-        /* 置中對齊的大畫布 */
-        .rosary-layout-container { position:relative; width:480px; height:560px; margin:0 auto; display: block; }
+        /* 念珠置中大畫布位置 */
+        .rosary-layout-container { position:relative; width:480px; height:580px; margin:0 auto; display: block; }
         
-        /* 1) 補齊：十字架與第一粒珠之間的金色連接線 (I連結) */
-        .rosary-layout-container::before { content: ''; position: absolute; left: 240px; top: 432px; width: 2px; height: 56px; background: linear-gradient(to bottom, var(--p-gold), #8b7355); transform: translateX(-50%); z-index: 2; pointer-events: none; opacity: 0.75; }
+        /* 一體化金色垂直「I」型穿線：筆直貫穿十字架至大圓環底部小珠之間，間距完全等距相等 */
+        .rosary-layout-container::before { content: ''; position: absolute; left: 240px; top: 340px; width: 2px; height: 180px; background: linear-gradient(to bottom, var(--p-gold), #8b7355); transform: translateX(-50%); z-index: 2; pointer-events: none; opacity: 0.75; }
         
-        /* 2) 修正與加長：第三粒小珠與大珠之間的獨立金色連接線 (加長版 I連結) */
-        .rosary-layout-container::after { content: ''; position: absolute; left: 240px; top: 310px; width: 2px; height: 42px; background: linear-gradient(to bottom, var(--p-gold), #8b7355); transform: translateX(-50%); z-index: 2; pointer-events: none; opacity: 0.75; }
-        
-        /* 經典實體畫作聖像外觀樣式 */
-        .divine-mercy-img { position:absolute; left:50%; top:38%; transform:translate(-50%, -50%); width:160px; height:240px; border-radius:12px; object-fit:cover; box-shadow:0 0 25px rgba(212,175,55,0.25), 0 4px 15px rgba(0,0,0,0.8); border:1px solid rgba(212,175,55,0.4); z-index:1; pointer-events:none; background:#16161c; }
+        /* 高清實體慈悲聖像樣式：寬度調整避免與環狀珠重疊 */
+        .divine-mercy-img { position:absolute; left:50%; top:35%; transform:translate(-50%, -50%); width:130px; height:195px; border-radius:10px; object-fit:cover; box-shadow:0 0 25px rgba(212,175,55,0.25), 0 4px 15px rgba(0,0,0,0.8); border:1px solid rgba(212,175,55,0.4); z-index:1; pointer-events:none; background:#16161c; }
         
         .bead { position:absolute; width:22px; height:22px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:bold; color:#aaa; cursor:pointer; transition:all 0.2s; transform:translate(-50%, -50%); z-index:5; }
         .bead.cross { width:54px; height:54px; border-radius:10px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:1.8rem; z-index:10; }
@@ -69,6 +66,8 @@ seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x,label:"†"});
 seq.push({id:1,type:"blue-style earlier-small-blue",title:P.p.t,text:P.p.x,label:""});
 seq.push({id:2,type:"blue-style earlier-small-blue",title:P.m.t,text:P.m.x,label:""});
 seq.push({id:3,type:"blue-style earlier-small-blue",title:P.c.t,text:P.c.x,label:""});
+
+// 5端循環：此處只建立數據庫。第一大珠的位置將在下方 render 的幾何坐標中精確挪到最頂端。
 for(let d=0;d<5;d++){
     seq.push({id:seq.length,type:"blue-style large-blue",title:`第 ${d+1} 端 · `+P.e.t,text:`(第 ${d+1} 端)\n`+P.e.x,label:""});
     for(let b=0;b<10;b++) seq.push({id:seq.length,type:"small",title:P.h.t,text:`(${b+1}/10)\n`+P.h.x,label:(b+1).toString()});
@@ -78,21 +77,31 @@ let idx=-1, playing=false, synth=window.speechSynthesis, utter=null, closingIdx=
 const startBtn=document.getElementById('start-btn'), pauseBtn=document.getElementById('pause-btn'), resetBtn=document.getElementById('reset-btn');
 const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container'), vSel=document.getElementById('voice-select');
 function render(){
-    const centerX = 240, centerY = 220; 
-    // 精密等距 Y 軸定位：508 -> 454 -> 416 -> 378 -> 340 (間距與珠子尺寸完美精算)
-    const crossY = 508, paterY = 454, aveY = 416, credoY = 378, loopBaseLargeBeadY = 340;
+    const centerX = 240, centerY = 195; 
+    // 精密等距 Y 軸定位：520 -> 480 -> 440 -> 400 -> 360，間隔拉開為完全相等的 40px 的 I 型連線
+    const crossY = 520, paterY = 480, aveY = 440, credoY = 400, loopBaseBeadY = 360;
     
+    box.innerHTML='';
     seq.forEach((b,i)=>{
         const el=document.createElement('div'); el.className=`bead ${b.type}`; el.innerHTML=b.label; let posX = centerX, posY = crossY;
         if(i === 0) { posX = centerX; posY = crossY; } 
         else if(i === 1) { posX = centerX; posY = paterY; } 
         else if(i === 2) { posX = centerX; posY = aveY; } 
         else if(i === 3) { posX = centerX; posY = credoY; } 
+        else if(i === 4) { 
+            // 核心調整：精準將第 1 粒藍色大珠（序號4）挪到大圓環正頂端（十二點鐘位置，即左邊1和右邊10的中間）
+            posX = centerX; posY = centerY - 165;
+        }
         else {
-            const ringIndex = i - 4; const totalRingBeads = seq.length - 4; const angle = (ringIndex / totalRingBeads) * 2 * Math.PI + Math.PI / 2;
+            // 其餘 49 顆念珠（扣除前5顆）流暢佈置在大圓環上，半徑左右拉寬，徹底杜絕與聖像重疊
+            const ringIndex = i - 5; 
+            const totalRingBeads = seq.length - 5;
+            // 起點從正下方稍微偏左開始繞行，繞回正下方
+            const angle = (ringIndex / totalRingBeads) * 2 * Math.PI + Math.PI / 2 + 0.12;
             const radiusX = 205 * Math.cos(angle); const radiusY = 165 * Math.sin(angle) * (1 - 0.22 * Math.sin(angle));
-            posX = centerX + radiusX; 
-            posY = (i === 4) ? loopBaseLargeBeadY : (centerY - 35 + radiusY);
+            posX = centerX + radiusX;
+            // 如果剛好是圓環最底端的最後一粒小珠，精確與幾何等距位置 Y 軸無縫銜接
+            posY = (i === seq.length - 1) ? loopBaseBeadY : (centerY + radiusY);
         }
         el.style.left = `${posX}px`; el.style.top = `${posY}px`; el.onclick=()=>{ if(playing) { playing=false; synth.cancel(); } closingIdx=0; jump(i); }; box.appendChild(el);
     });
@@ -125,7 +134,7 @@ function speak(){
     synth.cancel(); const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
     let v = getBestCantoneseVoice(); let optimizedText = optimizeTextForVoice(b.text, v);
     utter=new SpeechSynthesisUtterance(optimizedText); utter.lang = 'zh-HK'; if(v) utter.voice = v; 
-    utter.rate = 0.85; // 語速平靜安詳慢速誦念
+    utter.rate = 0.85; // 語速：0.85 安詳緩慢誦念
     utter.onend=()=>{ if(playing){ idx++; setTimeout(speak, 150); } }; utter.onerror=(e)=>{ console.log("TTS Loop Guard", e); if(playing){ setTimeout(speak, 400); } }; synth.speak(utter);
 }
 function speakClosingSequence() {
@@ -133,7 +142,7 @@ function speakClosingSequence() {
     synth.cancel(); const cp = closingPrayers[closingIdx]; tDisp.innerText = cp.title; xDisp.innerText = cp.text; document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
     let v = getBestCantoneseVoice(); let optimizedText = optimizeTextForVoice(cp.text, v);
     utter = new SpeechSynthesisUtterance(optimizedText); utter.lang = 'zh-HK'; if(v) utter.voice = v; 
-    utter.rate = 0.85; // 語速平靜安詳慢速誦念
+    utter.rate = 0.85; // 語速：0.85 安詳緩慢誦念
     utter.onend=()=>{ if(playing){ closingIdx++; setTimeout(speakClosingSequence, 150); } }; utter.onerror=()=>{ if(playing){ setTimeout(speakClosingSequence, 400); } }; synth.speak(utter);
 }
 function endRosary() { playing=false; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="重新開始"; closingIdx=0; }
