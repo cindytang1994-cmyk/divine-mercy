@@ -5,10 +5,10 @@
     <title>慈悲串經互動朗讀版 - divine-mercy</title>
     <style>
         :root { --p-gold: #d4af37; --bg: #121212; --panel: #1e1e1e; --txt: #f0f0f0; --glow: rgba(212,175,55,0.8); }
-        body { margin:0; padding:0; background:var(--bg); color:var(--txt); font-family:sans-serif; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+        body { margin:0; padding:0; background:var(--bg); color:var(--txt); font-family:sans-serif; display:flex; flex-direction:column; background-image: radial-gradient(circle at center, #1a1a1a 0%, #121212 100%); min-height:100vh; }
         header { text-align:center; padding:20px; background:var(--panel); width:100%; box-shadow:0 2px 10px rgba(0,0,0,0.5); }
         h1 { margin:0; color:var(--p-gold); font-size:1.8rem; }
-        .container { display:flex; flex-direction:column; align-items:center; width:100%; max-width:800px; padding:20px; box-sizing:border-box; }
+        .container { display:flex; flex-direction:column; align-items:center; width:100%; max-width:850px; padding:20px; box-sizing:border-box; }
         .controls { margin-bottom:20px; display:flex; gap:15px; }
         button { background:var(--p-gold); color:#000; border:none; padding:12px 24px; font-size:1rem; font-weight:bold; border-radius:25px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.3); }
         button:disabled { background:#555; color:#888; cursor:not-allowed; }
@@ -16,18 +16,19 @@
         #prayer-title { color:var(--p-gold); font-size:1.4rem; margin:0 0 10px 0; }
         #prayer-text { font-size:1.2rem; line-height:1.6; margin:0; white-space:pre-line; }
         
-        /* 擴大後的念珠畫布 */
-        .rosary-layout-container { position:relative; width:440px; height:520px; margin:20px auto; }
+        /* 撐大與優化後的念珠大畫布 */
+        .rosary-layout-container { position:relative; width:480px; height:560px; margin:20px auto; }
         
-        /* 中央慈悲聖像：精準置中嵌入 */
-        .divine-mercy-img { position:absolute; left:50%; top:42%; transform:translate(-50%, -50%); width:160px; height:240px; border-radius:12px; object-fit:cover; box-shadow:0 0 20px rgba(212,175,55,0.15), 0 4px 15px rgba(0,0,0,0.6); border:1px solid rgba(212,175,55,0.3); z-index:1; pointer-events:none; }
+        /* 十字架對上的垂直金色 I 連結線條 */
+        .rosary-layout-container::before { content: ''; position: absolute; left: 240px; top: 350px; width: 2px; height: 135px; background: linear-gradient(to bottom, var(--p-gold), #8b7355); transform: translateX(-50%); z-index: 2; pointer-events: none; opacity: 0.7; }
+        
+        /* 向量藝術聖像畫布 */
+        .divine-mercy-vector { position:absolute; left:50%; top:41%; transform:translate(-50%, -50%); width:180px; height:260px; border-radius:12px; box-shadow:0 0 25px rgba(212,175,55,0.2), 0 4px 15px rgba(0,0,0,0.8); border:1px solid rgba(212,175,55,0.4); z-index:1; pointer-events:none; background:#1a1a24; }
         
         .bead { position:absolute; width:22px; height:22px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:bold; color:#aaa; cursor:pointer; transition:all 0.2s; transform:translate(-50%, -50%); z-index:5; }
         .bead.cross { width:54px; height:54px; border-radius:10px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:1.8rem; z-index:10; }
         .bead.blue-style { background:#2a4d69; border-color:#4b86b4; color:#adcbe3; font-size:0rem; }
         .bead.large-blue { width:36px; height:36px; }
-        
-        /* 新增：開端 3 粒珠子更小、更優雅的樣式 */
         .bead.earlier-small-blue { width:16px; height:16px; }
         
         .bead.active { background:var(--p-gold)!important; border-color:#fff!important; color:#000!important; font-size:0.65rem; animation:pulse 0.8s infinite alternate; z-index:12; }
@@ -44,8 +45,20 @@
     <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="Google 粵語（香港）">廣東話 - Google 粵語（香港）</option></select></div>
     
     <div class="rosary-layout-container" id="beads-container">
-        <!-- 嵌入天主教標準通用經典慈悲耶穌畫像 -->
-        <img class="divine-mercy-img" src="https://unsplash.com" alt="Divine Mercy">
+        <!-- 純代碼向量繪製：永不失效、永不破圖的慈悲耶穌像 -->
+        <svg class="divine-mercy-vector" viewBox="0 0 100 150" xmlns="http://w3.org">
+            <path d="M50 25 C43 25, 41 35, 43 45 C38 60, 35 90, 38 125 L62 125 C65 90, 62 60, 57 45 C59 35, 57 25, 50 25 Z" fill="#2d2d3a"/>
+            <polygon points="50,65 5,130 35,135" fill="rgba(235, 64, 52, 0.4)" />
+            <polygon points="50,65 20,132 45,135" fill="rgba(235, 64, 52, 0.25)" />
+            <polygon points="50,65 95,130 65,135" fill="rgba(173, 216, 230, 0.4)" />
+            <polygon points="50,65 80,132 55,135" fill="rgba(173, 216, 230, 0.25)" />
+            <path d="M50 45 L41 125 L59 125 Z" fill="#f0f0f5"/>
+            <circle cx="50" cy="35" r="7" fill="#ebd2b0"/>
+            <path d="M42 30 Q50 20 58 30" fill="none" stroke="#d4af37" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="50" cy="65" r="3" fill="#fff" filter="blur(1px)"/>
+            <rect x="5" y="133" width="90" height="12" rx="3" fill="#222" stroke="#d4af37" stroke-width="0.5"/>
+            <text x="50" y="141" font-family="sans-serif" font-size="5.5" font-weight="bold" fill="#d4af37" text-anchor="middle">耶穌，我信賴祢！</text>
+        </svg>
     </div>
 </div>
 <script>
@@ -53,7 +66,7 @@ const P = {
     s:{t:"因父、及子、及聖神之名",x:"因父、及子、及聖神之名。亞孟。"},
     p:{t:"天主經",x:"我們的天父，願祢的名受顯揚；願祢的國來臨；願祢的旨意奉行在人間，如同在天上。求祢今天賞給我們日用的食糧；求祢寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑；但救我們免於凶惡。亞孟。"},
     m:{t:"聖母經",x:"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。亞孟。"},
-    c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。亞孟。"},
+    c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神. 我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。亞孟。"},
     e:{t:"永生之父",x:"永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。"},
     h:{t:"因祂的至悲慘苦難",x:"因祂的至悲慘苦難，求您垂憐我們及普世。"},
     g:{t:"至聖天主 (結尾三遍)",x:"至聖天主，至聖強有力者，致聖長存者，求您垂憐我們及普世。"},
@@ -61,7 +74,6 @@ const P = {
 };
 const seq = [];
 seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x,label:"†"});
-// 開端3粒珠子套用全新的更小藍色尺寸
 seq.push({id:1,type:"blue-style earlier-small-blue",title:P.p.t,text:P.p.x,label:""});
 seq.push({id:2,type:"blue-style earlier-small-blue",title:P.m.t,text:P.m.x,label:""});
 seq.push({id:3,type:"blue-style earlier-small-blue",title:P.c.t,text:P.c.x,label:""});
@@ -74,8 +86,8 @@ let idx=-1, playing=false, synth=window.speechSynthesis, utter=null, closingIdx=
 const startBtn=document.getElementById('start-btn'), pauseBtn=document.getElementById('pause-btn'), resetBtn=document.getElementById('reset-btn');
 const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container'), vSel=document.getElementById('voice-select');
 function render(){
-    // 重新精密設計的擴大版水滴下垂鏈圈坐標 (centerX、centerY 擴展，半徑調大)
-    const centerX = 220, centerY = 210; const crossY = 480, paterY = 425, aveY = 385, credoY = 345;
+    // 將中心點與垂直線的位置擴大 (centerX 改為 240)
+    const centerX = 240, centerY = 220; const crossY = 510, paterY = 450, aveY = 385, credoY = 325;
     seq.forEach((b,i)=>{
         const el=document.createElement('div'); el.className=`bead ${b.type}`; el.innerHTML=b.label; let posX = centerX, posY = crossY;
         if(i === 0) { posX = centerX; posY = crossY; } 
@@ -84,8 +96,9 @@ function render(){
         else if(i === 3) { posX = centerX; posY = credoY; } 
         else {
             const ringIndex = i - 4; const totalRingBeads = seq.length - 4; const angle = (ringIndex / totalRingBeads) * 2 * Math.PI + Math.PI / 2;
-            // 放大半徑（radiusX 從 145 撐大到 175，radiusY 從 115 撐大到 145），完美為中央慈悲聖像留出寬敞視野
-            const radiusX = 175 * Math.cos(angle); const radiusY = 145 * Math.sin(angle) * (1 - 0.22 * Math.sin(angle)); posX = centerX + radiusX; posY = centerY - 35 + radiusY;
+            // 經由精密拉大半徑（橫向半徑 205，縱向半徑 165）並微調變形比率，徹底將 1-10 粒小珠之間的距離拉開，完全不重疊
+            const radiusX = 205 * Math.cos(angle); const radiusY = 165 * Math.sin(angle) * (1 - 0.22 * Math.sin(angle));
+            posX = centerX + radiusX; posY = centerY - 35 + radiusY;
         }
         el.style.left = `${posX}px`; el.style.top = `${posY}px`; el.onclick=()=>{ if(playing) { playing=false; synth.cancel(); } closingIdx=0; jump(i); }; box.appendChild(el);
     });
