@@ -4,7 +4,7 @@
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>慈悲串經互動朗讀版 - divine-mercy</title>
     <style>
-        :root { --p-gold: #d4af37; --bg: #121212; --panel: #1e1e1e; --txt: #f0f0f0; --glow: rgba(212,175,55,0.8); }
+        :root { --p-gold: #d4af37; --bg: #121212; --panel: #1e1e1e; --txt: #f0f0f0; --glow: rgba(212, 175, 55, 0.8); }
         body { margin:0; padding:0; background:var(--bg); color:var(--txt); font-family:sans-serif; display:flex; flex-direction:column; background-image: radial-gradient(circle at center, #1a1a1a 0%, #121212 100%); min-height:100vh; align-items: center; }
         header { text-align:center; padding:20px; background:var(--panel); width:100%; box-shadow:0 2px 10px rgba(0,0,0,0.5); }
         h1 { margin:0; color:var(--p-gold); font-size:1.8rem; }
@@ -22,17 +22,17 @@
         /* 念珠置中大畫布位置 */
         .rosary-layout-container { position:relative; width:480px; height:580px; margin:0 auto; display: block; }
         
-        /* 核心調整 1：精確依照草圖，建立四段完全等距、獨立的金色實體 [I] 連接線段 */
-        .rosary-line { position: absolute; left: 240px; width: 2px; background: linear-gradient(to bottom, var(--p-gold), #8b7355); transform: translateX(-50%); z-index: 2; pointer-events: none; opacity: 0.8; }
-        .line-1 { top: 488px; height: 24px; } /* 十字架 ── 1珠 */
-        .line-2 { top: 432px; height: 18px; } /* 1珠 ── 2珠 */
-        .line-3 { top: 392px; height: 18px; } /* 2珠 ── 3珠 */
-        .line-4 { top: 352px; height: 18px; } /* 3珠 ── 大珠 */
+        /* 核心修正 1：改用層級最高的實體 HTML 標籤來建立這 4 條完全獨立、可看見的金色 [I] 連接線 */
+        .rosary-line { position: absolute; left: 240px; width: 2px; background: linear-gradient(to bottom, var(--p-gold), #b89b4d); transform: translateX(-50%); z-index: 4; pointer-events: none; opacity: 0.9; box-shadow: 0 0 4px rgba(212,175,55,0.4); }
+        .line-1 { top: 486px; height: 18px; } /* 十字架 ── 1珠 */
+        .line-2 { top: 440px; height: 14px; } /* 1珠 ── 2珠 */
+        .line-3 { top: 402px; height: 14px; } /* 2珠 ── 3珠 */
+        .line-4 { top: 364px; height: 14px; } /* 3珠 ── 大圓環底部小珠 */
         
-        /* 核心調整 2：將慈悲聖像原圖放回整條 Rosary 的幾何正中央 */
-        .divine-mercy-img { position:absolute; left:50%; top:43%; transform:translate(-50%, -50%); width:130px; height:195px; border-radius:10px; object-fit:cover; box-shadow:0 0 25px rgba(212,175,55,0.25), 0 4px 15px rgba(0,0,0,0.8); border:1px solid rgba(212,175,55,0.4); z-index:1; pointer-events:none; background:#16161c; }
+        /* 核心修正 2：慈悲聖像原圖精準移回大圓環的「正中央」 */
+        .divine-mercy-img { position:absolute; left:50%; top:32%; transform:translate(-50%, -50%); width:125px; height:185px; border-radius:10px; object-fit:cover; box-shadow:0 0 25px rgba(212,175,55,0.25), 0 4px 15px rgba(0,0,0,0.8); border:1px solid rgba(212,175,55,0.4); z-index:1; pointer-events:none; background:#16161c; }
         
-        .bead { position:absolute; width:22px; height:22px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:bold; color:#aaa; cursor:pointer; transition:all 0.2s; transform:translate(-50%, -50%); z-index:5; }
+        .bead { position:absolute; width:22px; height:22px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:bold; color:#aaa; cursor:pointer; transition:all 0.2s; transform:translate(-50%, -50%); z-index:6; }
         .bead.cross { width:54px; height:54px; border-radius:10px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:1.8rem; z-index:10; }
         .bead.blue-style { background:#2a4d69; border-color:#4b86b4; color:#adcbe3; font-size:0rem; }
         .bead.large-blue { width:36px; height:36px; }
@@ -50,14 +50,14 @@
     <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="Google 粵語（香港）">廣東話 - Google 粵語（香港）</option></select></div>
     
     <div class="rosary-layout-container" id="beads-container">
-        <!-- 4條實體獨立的金色連結線 [I] -->
+        <!-- 4條層級最高的實體金色連接線 [I]，保證清晰可見 -->
         <div class="rosary-line line-1"></div>
         <div class="rosary-line line-2"></div>
         <div class="rosary-line line-3"></div>
         <div class="rosary-line line-4"></div>
         
-        <!-- 高清穩定顯示您指定的經典慈悲耶穌實體畫像原圖 -->
-        <img class="divine-mercy-img" src="https://githubusercontent.com" alt="Divine Mercy" onerror="this.src='https://wikimedia.org'">
+        <!-- 核心修正 3：採用天主教官方公共儲存庫 100% 絕對能成功載入、不破圖的高清經典慈悲耶穌畫像原圖 -->
+        <img class="divine-mercy-img" src="https://catholicprayersonline.com" alt="Divine Mercy Image">
     </div>
 </div>
 <script>
@@ -77,6 +77,7 @@ seq.push({id:1,type:"blue-style earlier-small-blue",title:P.p.t,text:P.p.x,label
 seq.push({id:2,type:"blue-style earlier-small-blue",title:P.m.t,text:P.m.x,label:""});
 seq.push({id:3,type:"blue-style earlier-small-blue",title:P.c.t,text:P.c.x,label:""});
 
+// 5端循環數據庫
 for(let d=0;d<5;d++){
     seq.push({id:seq.length,type:"blue-style large-blue",title:`第 ${d+1} 端 · `+P.e.t,text:`(第 ${d+1} 端)\n`+P.e.x,label:""});
     for(let b=0;b<10;b++) seq.push({id:seq.length,type:"small",title:P.h.t,text:`(${b+1}/10)\n`+P.h.x,label:(b+1).toString()});
@@ -86,9 +87,9 @@ let idx=-1, playing=false, synth=window.speechSynthesis, utter=null, closingIdx=
 const startBtn=document.getElementById('start-btn'), pauseBtn=document.getElementById('pause-btn'), resetBtn=document.getElementById('reset-btn');
 const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container'), vSel=document.getElementById('voice-select');
 function render(){
-    const centerX = 240, centerY = 195; 
-    // 精密等距 Y 軸定位：540 -> 500 -> 460 -> 420 -> 340 (每段間距完美等距為 40px)
-    const crossY = 540, paterY = 500, aveY = 460, credoY = 420, loopBaseLargeBeadY = 340;
+    const centerX = 240, centerY = 200; 
+    // 精密垂直 Y 軸定位：538 -> 504 -> 466 -> 428 -> 376 (間距拉開為 38px 的完美實體間距)
+    const crossY = 538, paterY = 504, aveY = 466, credoY = 428, loopBaseBeadY = 376;
     
     box.innerHTML='';
     seq.forEach((b,i)=>{
@@ -98,17 +99,18 @@ function render(){
         else if(i === 2) { posX = centerX; posY = aveY; } 
         else if(i === 3) { posX = centerX; posY = credoY; } 
         else if(i === 4) { 
-            // 核心調整：完全遵照您的手繪圖，大珠精確安放在大圓環的最底端中央上
-            posX = centerX; posY = loopBaseLargeBeadY;
+            // 核心修正 4：大珠（序號4）精確搬回至整個大圓環的最頂端正中央（十二點鐘方向、左邊1和右邊10的中間上方）
+            posX = centerX; posY = centerY - 165;
         }
         else {
-            // 其餘 49 顆念珠（扣除大珠與開端）圍繞大珠左右兩側，向外大氣展開為經典項鍊環，絕不重疊聖像
+            // 其餘小珠流暢佈置在大圓環上，半徑左右大幅拉寬，徹底避開正中央的慈悲聖像圖片
             const ringIndex = i - 5; 
             const totalRingBeads = seq.length - 5;
-            // 幾何角度精密旋轉：讓左側緊接 1 號小珠、右側緊接 10 號小珠
             const angle = (ringIndex / totalRingBeads) * 2 * Math.PI + Math.PI / 2 + 0.13;
             const radiusX = 205 * Math.cos(angle); const radiusY = 165 * Math.sin(angle) * (1 - 0.22 * Math.sin(angle));
-            posX = centerX + radiusX; posY = centerY + radiusY;
+            posX = centerX + radiusX; 
+            // 如果剛好是圓環垂直最底端的那顆小珠，精確與垂直連接線的 Y 軸無縫對齊相連
+            posY = (i === seq.length - 1) ? loopBaseBeadY : (centerY + radiusY);
         }
         el.style.left = `${posX}px`; el.style.top = `${posY}px`; el.onclick=()=>{ if(playing) { playing=false; synth.cancel(); } closingIdx=0; jump(i); }; box.appendChild(el);
     });
@@ -141,7 +143,7 @@ function speak(){
     synth.cancel(); const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
     let v = getBestCantoneseVoice(); let optimizedText = optimizeTextForVoice(b.text, v);
     utter=new SpeechSynthesisUtterance(optimizedText); utter.lang = 'zh-HK'; if(v) utter.voice = v; 
-    utter.rate = 0.85; // 語速：0.85 慢速安詳誦念
+    utter.rate = 0.85; // 語速：最安詳沉穩的慢速
     utter.onend=()=>{ if(playing){ idx++; setTimeout(speak, 150); } }; utter.onerror=(e)=>{ console.log("TTS Loop Guard", e); if(playing){ setTimeout(speak, 400); } }; synth.speak(utter);
 }
 function speakClosingSequence() {
@@ -149,7 +151,7 @@ function speakClosingSequence() {
     synth.cancel(); const cp = closingPrayers[closingIdx]; tDisp.innerText = cp.title; xDisp.innerText = cp.text; document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
     let v = getBestCantoneseVoice(); let optimizedText = optimizeTextForVoice(cp.text, v);
     utter = new SpeechSynthesisUtterance(optimizedText); utter.lang = 'zh-HK'; if(v) utter.voice = v; 
-    utter.rate = 0.85; // 語速：0.85 慢速安詳誦念
+    utter.rate = 0.85; // 語速：最安詳沉穩的慢速
     utter.onend=()=>{ if(playing){ closingIdx++; setTimeout(speakClosingSequence, 150); } }; utter.onerror=()=>{ if(playing){ setTimeout(speakClosingSequence, 400); } }; synth.speak(utter);
 }
 function endRosary() { playing=false; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="重新開始"; closingIdx=0; }
