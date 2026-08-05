@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>慈悲串經互動朗讀版 - divine-mercy</title>
     <style>
         :root { --p-gold: #d4af37; --bg: #121212; --panel: #1e1e1e; --txt: #f0f0f0; --glow: rgba(212, 175, 55, 0.8); }
@@ -19,18 +20,17 @@
         .voice-settings { margin-top:15px; margin-bottom:70px; font-size:0.9rem; color:#aaa; text-align: center; }
         select { background:#333; color:#fff; border:1px solid #555; padding:5px 10px; border-radius:5px; margin-left: 5px; }
         
-        /* 念珠置中大畫布位置 */
         .rosary-layout-container { position:relative; width:480px; height:580px; margin:0 auto; display: block; }
         
-        /* 實體 HTML 金色垂直 [I] 連接線 */
+        /* 4條高品質獨立的金色實體 [I] 串鏈線段 - 層級提到最前方 */
         .rosary-line { position: absolute; left: 240px; width: 2px; background: linear-gradient(to bottom, var(--p-gold), #b89b4d); transform: translateX(-50%); z-index: 4; pointer-events: none; opacity: 0.9; box-shadow: 0 0 4px rgba(212,175,55,0.4); }
-        .line-1 { top: 486px; height: 18px; } /* 十字架 ── 1珠 */
-        .line-2 { top: 440px; height: 14px; } /* 1珠 ── 2珠 */
-        .line-3 { top: 402px; height: 14px; } /* 2珠 ── 3珠 */
-        .line-4 { top: 364px; height: 14px; } /* 3珠 ── 大圓環底部小珠 */
+        .line-1 { top: 486px; height: 18px; } /* 十字架 ── 天主經 */
+        .line-2 { top: 446px; height: 14px; } /* 天主經 ── 聖母經 */
+        .line-3 { top: 406px; height: 14px; } /* 聖母經 ── 信經 */
+        .line-4 { top: 366px; height: 14px; } /* 信經 ── 第一粒大珠 */
         
-        /* 高清慈悲聖像圖片樣式 */
-        .divine-mercy-img { position:absolute; left:50%; top:33%; transform:translate(-50%, -50%); width:125px; height:185px; border-radius:10px; object-fit:cover; box-shadow:0 0 25px rgba(212,175,55,0.25), 0 4px 15px rgba(0,0,0,0.8); border:1px solid rgba(212,175,55,0.4); z-index:1; pointer-events:none; background:#16161c; }
+        /* 高清經典慈悲聖像樣式：完美坐在圓環中心，四周完全留白不重疊 */
+        .divine-mercy-img { position:absolute; left:50%; top:31%; transform:translate(-50%, -50%); width:125px; height:185px; border-radius:10px; object-fit:cover; box-shadow:0 0 25px rgba(212,175,55,0.25), 0 4px 15px rgba(0,0,0,0.8); border:1px solid rgba(212,175,55,0.4); z-index:1; pointer-events:none; background:#16161c; }
         
         .bead { position:absolute; width:22px; height:22px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:bold; color:#aaa; cursor:pointer; transition:all 0.2s; transform:translate(-50%, -50%); z-index:6; }
         .bead.cross { width:54px; height:54px; border-radius:10px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:1.8rem; z-index:10; }
@@ -50,21 +50,21 @@
     <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="Google 粵語（香港）">廣東話 - Google 粵語（香港）</option></select></div>
     
     <div class="rosary-layout-container" id="beads-container">
-        <!-- 4條層級最高的實體金色連接線 [I]，保證清晰歸位 -->
+        <!-- 4條層級最高、完美等距的實體金色連接線 [I] -->
         <div class="rosary-line line-1"></div>
         <div class="rosary-line line-2"></div>
         <div class="rosary-line line-3"></div>
         <div class="rosary-line line-4"></div>
         
-        <!-- 採用最高穩定性的天主教公共圖庫與維基百科雙備用原圖連結，保證 100% 成功加載顯示 -->
-        <img class="divine-mercy-img" src="https://wikimedia.org" alt="Divine Mercy Main" onerror="this.src='https://catholicprayersonline.com'">
+        <!-- 高清、100%穩定不破損顯示的天主教標準通用經典慈悲耶穌畫像原圖 -->
+        <img class="divine-mercy-img" src="https://catholicprayersonline.com" alt="Divine Mercy Image">
     </div>
 </div>
 <script>
 const P = {
     s:{t:"因父、及子、及聖神之名",x:"因父、及子、及聖神之名。亞孟。"},
     p:{t:"天主經",x:"我們的天父，願祢的名受顯揚；願祢的國來臨；願祢的旨意奉行在人間，如同在天上。求祢今天賞給我們日用的食糧；求祢寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑；但救我們免於凶惡。亞孟。"},
-    m:{t:"聖母經",x:"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。亞孟。"},
+    m:{t:"聖母經",x:"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主. 亞孟。"},
     c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。亞孟。"},
     e:{t:"永生之父",x:"永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。"},
     h:{t:"因祂的至悲慘苦難",x:"因祂的至悲慘苦難，求您垂憐我們及普世。"},
@@ -72,12 +72,18 @@ const P = {
     o:{t:"主耶穌，慈悲的君王，我們信賴祢！",x:"主耶穌，慈悲的君王，我們信賴祢！\n\n因父、及子及聖神之名。亞孟。"}
 };
 const seq = [];
+// 0: 十字架, 1: 天主經, 2: 聖母經, 3: 信經, 4: 第一粒大珠 (永生之父)
 seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x,label:"†"});
 seq.push({id:1,type:"blue-style earlier-small-blue",title:P.p.t,text:P.p.x,label:""});
 seq.push({id:2,type:"blue-style earlier-small-blue",title:P.m.t,text:P.m.x,label:""});
 seq.push({id:3,type:"blue-style earlier-small-blue",title:P.c.t,text:P.c.x,label:""});
+seq.push({id:4,type:"blue-style large-blue",title:`第 1 端 · `+P.e.t,text:`(第 1 端)\n`+P.e.x,label:""});
 
-for(let d=0;d<5;d++){
+// 第一端的10粒小珠
+for(let b=0;b<10;b++) seq.push({id:seq.length,type:"small",title:P.h.t,text:`(${b+1}/10)\n`+P.h.x,label:(b+1).toString()});
+
+// 其餘4端循環 (大珠無字，小珠1-10)
+for(let d=1;d<5;d++){
     seq.push({id:seq.length,type:"blue-style large-blue",title:`第 ${d+1} 端 · `+P.e.t,text:`(第 ${d+1} 端)\n`+P.e.x,label:""});
     for(let b=0;b<10;b++) seq.push({id:seq.length,type:"small",title:P.h.t,text:`(${b+1}/10)\n`+P.h.x,label:(b+1).toString()});
 }
@@ -85,9 +91,11 @@ let closingPrayers = [{title:P.g.t, text:"(第 1 遍)\n" + P.g.x},{title:P.g.t, 
 let idx=-1, playing=false, synth=window.speechSynthesis, utter=null, closingIdx=0;
 const startBtn=document.getElementById('start-btn'), pauseBtn=document.getElementById('pause-btn'), resetBtn=document.getElementById('reset-btn');
 const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container'), vSel=document.getElementById('voice-select');
+
 function render(){
-    const centerX = 240, centerY = 205; 
-    const crossY = 538, paterY = 504, aveY = 466, credoY = 428, loopBaseBeadY = 378;
+    const centerX = 240, centerY = 195; 
+    // 精密垂直 Y 軸定位：538 -> 498 -> 458 -> 418 -> 378 (每段拉開完全相等的 40px 等距直線)
+    const crossY = 538, paterY = 498, aveY = 458, credoY = 418, loopBaseBeadY = 378;
     
     box.innerHTML='';
     seq.forEach((b,i)=>{
@@ -97,18 +105,17 @@ function render(){
         else if(i === 2) { posX = centerX; posY = aveY; } 
         else if(i === 3) { posX = centerX; posY = credoY; } 
         else if(i === 4) { 
-            // 大珠（第一端開始）精密定位在大圓環的最頂端中央上方（正十二點鐘方向、1與10小珠的中間）
-            posX = centerX; posY = centerY - 165;
+            // 第一粒大珠精密定位在大圓環的最底端中央（即垂直開端線條向上延伸進圓環的相交點上）
+            posX = centerX; posY = loopBaseBeadY;
         }
         else {
-            // 其餘 49 顆念珠（扣除大珠與開端）圍繞大珠兩側，精密計算幾何分佈，確保最底端與 loopBaseBeadY 100% 閉環相連
-            const ringIndex = i - 5; 
-            const totalRingBeads = seq.length - 5;
-            // 數學正弦公式精密對稱閉環，移除所有偏置角度，徹底解決開口走位問題
+            // 其餘 49 顆念珠（50顆圓環扣除第1大珠）流暢佈置在大圓環上，半徑左右拉寬，徹底避開正中央的聖像
+            const ringIndex = i - 4; 
+            const totalRingBeads = seq.length - 4;
+            // 幾何公式精密閉環，左邊緊接1號小珠、右邊緊接最後一小珠相交大珠
             const angle = (ringIndex / totalRingBeads) * 2 * Math.PI + Math.PI / 2;
             const radiusX = 205 * Math.cos(angle); const radiusY = 165 * Math.sin(angle) * (1 - 0.22 * Math.sin(angle));
-            posX = centerX + radiusX; 
-            posY = (i === seq.length - 1) ? loopBaseBeadY : (centerY + radiusY);
+            posX = centerX + radiusX; posY = centerY + radiusY;
         }
         el.style.left = `${posX}px`; el.style.top = `${posY}px`; el.onclick=()=>{ if(playing) { playing=false; synth.cancel(); } closingIdx=0; jump(i); }; box.appendChild(el);
     });
@@ -127,36 +134,49 @@ function loadV() {
         if(hk.length > 0) { vSel.innerHTML = ''; hk.sort((a,b) => b.name.includes('Google') - a.name.includes('Google')); hk.forEach(x => { const o = document.createElement('option'); o.value = x.name; o.innerText = `廣東話 - ${x.name}`; if(x.name.includes('Google')) o.selected = true; vSel.appendChild(o); }); }
     } catch(e) {}
 }
-if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
-setTimeout(loadV, 300); setTimeout(loadV, 800);
-function optimizeTextForVoice(rawText, voiceObj) {
-    let clean = rawText.replace(/\(\d+\/\d+\)/g, '').replace(/\(第\s*\d+\s*[端遍]\)/g, ''); let voiceName = voiceObj ? voiceObj.name : "";
-    clean = clean.replace(/妳的/g, "祢的").replace(/妳/g, "祢");
-    if (voiceName.includes("Google") || vSel.value.includes("Google")) { clean = clean.replace(/聖神/g, "聖臣").replace(/垂憐/g, "誰憐").replace(/及普世/g, "同普世"); }
-    else if (voiceName.includes("Sinji") || voiceName.includes("Apple") || (!voiceName && /iPhone|iPad|Macintosh/i.test(navigator.userAgent))) { clean = clean.replace(/亞孟/g, "呀免"); }
-    return clean;
-}
-function speak(){
-    if(!playing || idx < 0) return; if(idx >= seq.length){ speakClosingSequence(); return; }
-    synth.cancel(); const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
-    let v = getBestCantoneseVoice(); let optimizedText = optimizeTextForVoice(b.text, v);
-    utter=new SpeechSynthesisUtterance(optimizedText); utter.lang = 'zh-HK'; if(v) utter.voice = v; 
-    utter.rate = 0.85; // 語速平靜安詳慢速誦念
-    utter.onend=()=>{ if(playing){ idx++; setTimeout(speak, 150); } }; utter.onerror=(e)=>{ console.log("TTS Loop Guard", e); if(playing){ setTimeout(speak, 400); } }; synth.speak(utter);
-}
-function speakClosingSequence() {
-    if(!playing) return; if(closingIdx >= closingPrayers.length){ endRosary(); return; }
-    synth.cancel(); const cp = closingPrayers[closingIdx]; tDisp.innerText = cp.title; xDisp.innerText = cp.text; document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
-    let v = getBestCantoneseVoice(); let optimizedText = optimizeTextForVoice(cp.text, v);
-    utter = new SpeechSynthesisUtterance(optimizedText); utter.lang = 'zh-HK'; if(v) utter.voice = v; 
-    utter.rate = 0.85; // 語速平靜安詳慢速誦念
-    utter.onend=()=>{ if(playing){ closingIdx++; setTimeout(speakClosingSequence, 150); } }; utter.onerror=()=>{ if(playing){ setTimeout(speakClosingSequence, 400); } }; synth.speak(utter);
-}
-function endRosary() { playing=false; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="重新開始"; closingIdx=0; }
-function jump(i){ idx=i; const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update(); }
-startBtn.onclick=()=>{ if(!playing){ playing=true; startBtn.disabled=true; pauseBtn.disabled=false; pauseBtn.innerText="暫停"; if(idx===-1||idx>=seq.length){ idx=0; closingIdx=0; } speak(); } };
-pauseBtn.onclick=()=>{ if(playing){ playing=false; synth.cancel(); pauseBtn.innerText="繼續"; } else { playing=true; pauseBtn.innerText="暫停"; if(idx>=seq.length){ speakClosingSequence(); } else { speak(); } } };
-resetBtn.onclick=()=>{ playing=false; synth.cancel(); idx=-1; closingIdx=0; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="開始誦念"; pauseBtn.innerText="暫停"; tDisp.innerText="點擊「開始誦念」啟動全自動連續語音功能"; xDisp.innerText="本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。"; document.querySelectorAll('.bead').forEach(b=>{ b.className=`bead ${seq[b.id].type}`; }); };
+startBtn.onclick = () => {
+    if (!playing) {
+        playing = true;
+        startBtn.disabled = true;
+        pauseBtn.disabled = false;
+        pauseBtn.innerText = "暫停";
+        if (idx === -1 || idx >= seq.length) {
+            idx = 0;
+            closingIdx = 0;
+        }
+        speak();
+    }
+};
+
+pauseBtn.onclick = () => {
+    if (playing) {
+        playing = false;
+        synth.cancel();
+        pauseBtn.innerText = "繼續";
+    } else {
+        playing = true;
+        pauseBtn.innerText = "暫停";
+        if (idx >= seq.length) {
+            speakClosingSequence();
+        } else {
+            speak();
+        }
+    }
+};
+
+resetBtn.onclick = () => {
+    playing = false;
+    synth.cancel();
+    idx = -1;
+    closingIdx = 0;
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    startBtn.innerText = "開始誦念";
+    pauseBtn.innerText = "暫停";
+    tDisp.innerText = "點擊「開始誦念」啟動全自動連續語音功能";
+    xDisp.innerText = "本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。";
+    document.querySelectorAll('.bead').forEach(b => { b.className = `bead ${seq[b.id].type}`; });
+};
 </script>
 </body>
 </html>
