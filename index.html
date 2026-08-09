@@ -60,11 +60,17 @@
             font-size: 0.85rem;
             color: #aaa;
             display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+        }
+        .voice-row {
+            display: flex;
             align-items: center;
             gap: 6px;
             min-width: 0;
         }
-        .voice-settings label { white-space: nowrap; }
+        .voice-settings label { white-space: nowrap; flex: 0 0 auto; }
         select {
             background: #333;
             color: #fff;
@@ -225,12 +231,23 @@
             <button id="reset-btn">重設</button>
         </div>
         <div class="voice-settings">
-            <label for="voice-select">廣東話語音：</label>
-            <select id="voice-select"><option value="Google 粵語（香港）">廣東話 - Google 粵語（香港）</option></select>
+            <div class="voice-row">
+                <label for="lang-select">語言：</label>
+                <select id="lang-select">
+                    <option value="yue">廣東話</option>
+                    <option value="zh-TW">國語（台灣）</option>
+                    <option value="zh-CN">普通話（大陸）</option>
+                    <option value="zh-other">其他中文</option>
+                </select>
+            </div>
+            <div class="voice-row">
+                <label for="voice-select">語音：</label>
+                <select id="voice-select"><option value="">載入中…</option></select>
+            </div>
         </div>
         <div id="display-panel">
             <h2 id="prayer-title">點擊「開始誦念」啟動全自動連續語音功能</h2>
-            <p id="prayer-text">本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。</p>
+            <p id="prayer-text">本系統支援中文語音朗誦（廣東話／國語／普通話），念珠會隨語音進度同步跳動發光。可在上方切換語言與語音。</p>
         </div>
     </aside>
     <section class="right-pane">
@@ -271,8 +288,12 @@ for(let d=1;d<5;d++){
 let closingPrayers = [{title:P.g.t, text:"(第 1 遍)\n" + P.g.x},{title:P.g.t, text:"(第 2 遍)\n" + P.g.x},{title:P.g.t, text:"(第 3 遍)\n" + P.g.x},{title:P.o.t, text:P.o.x}];
 let idx=-1, playing=false, synth=window.speechSynthesis, utter=null, closingIdx=0;
 const startBtn=document.getElementById('start-btn'), pauseBtn=document.getElementById('pause-btn'), resetBtn=document.getElementById('reset-btn');
-const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container'), vSel=document.getElementById('voice-select');
+const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container');
+const lSel=document.getElementById('lang-select'), vSel=document.getElementById('voice-select');
 const stage=document.getElementById('rosary-stage');
+const LANG_PREF_KEY='pray-lang', VOICE_PREF_KEY='pray-voice';
+const LANG_ORDER=['yue','zh-TW','zh-CN','zh-other'];
+const LANG_LABELS={yue:'廣東話','zh-TW':'國語（台灣）','zh-CN':'普通話（大陸）','zh-other':'其他中文'};
 function fitRosary(){
     if (!stage || !box) return;
     const pad = 16; // keep ring edge and cross inside the stage
@@ -349,56 +370,100 @@ function render(){
 function update(){ document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); }else b.className=`bead ${seq[i].type}`; }); }
 render();
 window.addEventListener('resize', fitRosary);
-function isCantoneseVoice(v) {
-    const lang = (v.lang || '').toLowerCase();
+function classifyVoiceLang(v) {
+    const lang = (v.lang || '').toLowerCase().replace(/_/g, '-');
     const name = (v.name || '').toLowerCase();
-    return lang.includes('zh-hk') || lang.includes('yue') || name.includes('cantonese') || name.includes('hong kong') || name.includes('粵語') || name.includes('廣東');
+    const isYue = lang.includes('zh-hk') || lang.includes('yue') || name.includes('cantonese') || name.includes('hong kong') || name.includes('粵語') || name.includes('廣東') || name.includes('sinji');
+    if (isYue) return 'yue';
+    if (lang.startsWith('zh-tw') || name.includes('taiwan') || name.includes('meijia') || name.includes('美佳')) return 'zh-TW';
+    if (lang.startsWith('zh-cn') || lang === 'zh' || name.includes('chinese (china)') || name.includes('tingting') || name.includes('ting-ting') || name.includes('丽娜') || name.includes('婷婷')) return 'zh-CN';
+    if (lang.startsWith('zh') || name.includes('chinese') || name.includes('mandarin') || name.includes('中文') || name.includes('國語') || name.includes('普通话') || name.includes('普通話')) return 'zh-other';
+    return null;
 }
-function getBestCantoneseVoice() {
+function scoreVoice(v, langKey) {
+    const name = v.name || '';
+    let score = 0;
+    if (name.includes('Google')) score += 30;
+    if (name.includes('Enhanced') || name.includes('Premium') || name.includes('Neural')) score += 20;
+    if (langKey === 'yue' && (name.includes('Sinji') || name.includes('粵語'))) score += 10;
+    if (v.localService) score += 5;
+    return score;
+}
+function voicesForLang(langKey) {
     try {
-        const voices = synth.getVoices();
-        let target = voices.find(x => x.name.includes('Google') && isCantoneseVoice(x));
-        if (!target) target = voices.find(isCantoneseVoice);
-        return target || null;
-    } catch(e) { return null; }
+        return synth.getVoices().filter(v => classifyVoiceLang(v) === langKey)
+            .sort((a, b) => scoreVoice(b, langKey) - scoreVoice(a, langKey) || a.name.localeCompare(b.name));
+    } catch (e) { return []; }
 }
 function getAssignedVoice() {
     try {
         const voices = synth.getVoices();
         const selected = voices.find(x => x.name === vSel.value);
         if (selected) return selected;
-        return getBestCantoneseVoice();
-    } catch(e) { return null; }
+        const list = voicesForLang(lSel.value);
+        return list[0] || voices.find(v => classifyVoiceLang(v)) || null;
+    } catch (e) { return null; }
 }
 function loadV() {
     try {
         const voices = synth.getVoices();
         if (!voices || voices.length === 0) return;
-        const prev = vSel.value;
-        const hk = voices.filter(isCantoneseVoice);
-        if (hk.length === 0) return;
+
+        const available = LANG_ORDER.filter(k => voicesForLang(k).length > 0);
+        if (available.length === 0) {
+            vSel.innerHTML = '<option value="">此裝置未找到中文語音</option>';
+            return;
+        }
+
+        const savedLang = localStorage.getItem(LANG_PREF_KEY);
+        const prevLang = lSel.value;
+        const langPick = available.includes(savedLang) ? savedLang
+            : (available.includes(prevLang) ? prevLang : available[0]);
+
+        lSel.innerHTML = '';
+        available.forEach(k => {
+            const o = document.createElement('option');
+            o.value = k;
+            o.textContent = LANG_LABELS[k];
+            lSel.appendChild(o);
+        });
+        lSel.value = langPick;
+
+        const list = voicesForLang(langPick);
+        const savedVoice = localStorage.getItem(VOICE_PREF_KEY);
+        const prevVoice = vSel.value;
         vSel.innerHTML = '';
-        hk.sort((a,b) => Number(b.name.includes('Google')) - Number(a.name.includes('Google')));
-        hk.forEach(x => {
+        list.forEach(x => {
             const o = document.createElement('option');
             o.value = x.name;
-            o.innerText = `廣東話 - ${x.name}`;
+            o.textContent = x.name;
             vSel.appendChild(o);
         });
-        const keep = hk.find(x => x.name === prev);
-        vSel.value = keep ? keep.name : (hk.find(x => x.name.includes('Google')) || hk[0]).name;
-    } catch(e) {}
+        const keep = list.find(x => x.name === prevVoice) || list.find(x => x.name === savedVoice);
+        vSel.value = keep ? keep.name : list[0].name;
+
+        localStorage.setItem(LANG_PREF_KEY, lSel.value);
+        localStorage.setItem(VOICE_PREF_KEY, vSel.value);
+    } catch (e) {}
 }
 if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
 setTimeout(loadV, 300); setTimeout(loadV, 800);
+function isAppleChineseVoice(voiceObj) {
+    const name = voiceObj ? (voiceObj.name || '') : '';
+    if (name.includes('Sinji') || name.includes('Meijia') || name.includes('Tingting') || name.includes('Ting-Ting') || name.includes('Apple')) return true;
+    return !name && /iPhone|iPad|Macintosh/i.test(navigator.userAgent);
+}
 function optimizeTextForVoice(rawText, voiceObj) {
     let clean = rawText.replace(/\(\d+\/\d+\)/g, '').replace(/\(第\s*\d+\s*[端遍]\)/g, '');
-    const voiceName = voiceObj ? voiceObj.name : "";
-    clean = clean.replace(/妳的/g, "祢的").replace(/妳/g, "祢");
-    if (voiceName.includes("Google") || vSel.value.includes("Google")) {
-        clean = clean.replace(/聖神/g, "聖臣").replace(/垂憐/g, "誰憐").replace(/及普世/g, "同普世");
-    } else if (voiceName.includes("Sinji") || voiceName.includes("Apple") || (!voiceName && /iPhone|iPad|Macintosh/i.test(navigator.userAgent))) {
-        clean = clean.replace(/亞孟/g, "呀免");
+    const voiceName = voiceObj ? voiceObj.name : '';
+    const langKey = classifyVoiceLang(voiceObj) || lSel.value;
+    clean = clean.replace(/妳的/g, '祢的').replace(/妳/g, '祢');
+    if (voiceName.includes('Google') || vSel.value.includes('Google')) {
+        if (langKey === 'yue') {
+            clean = clean.replace(/聖神/g, '聖臣').replace(/垂憐/g, '誰憐').replace(/及普世/g, '同普世');
+        }
+    } else if (langKey === 'yue' && isAppleChineseVoice(voiceObj)) {
+        clean = clean.replace(/亞孟/g, '呀免');
     }
     return clean;
 }
@@ -407,7 +472,8 @@ function speakWithAssignedVoice(text, onDone) {
     const v = getAssignedVoice();
     const optimizedText = optimizeTextForVoice(text, v);
     utter = new SpeechSynthesisUtterance(optimizedText);
-    utter.lang = (v && v.lang) ? v.lang : 'zh-HK';
+    const langFallback = { yue: 'zh-HK', 'zh-TW': 'zh-TW', 'zh-CN': 'zh-CN', 'zh-other': 'zh-TW' };
+    utter.lang = (v && v.lang) ? v.lang : (langFallback[lSel.value] || 'zh-HK');
     if (v) utter.voice = v;
     utter.rate = 0.85;
     utter.onend = () => { if (playing) onDone(); };
@@ -451,8 +517,23 @@ function beginReadingFrom(i){
 }
 startBtn.onclick=()=>{ if(!playing){ beginReadingFrom(idx===-1||idx>=seq.length ? 0 : idx); } };
 pauseBtn.onclick=()=>{ if(playing){ playing=false; synth.cancel(); pauseBtn.innerText="繼續"; } else { playing=true; pauseBtn.innerText="暫停"; if(idx>=seq.length){ speakClosingSequence(); } else { speak(); } } };
-resetBtn.onclick=()=>{ playing=false; synth.cancel(); idx=-1; closingIdx=0; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="開始誦念"; pauseBtn.innerText="暫停"; showPrayer("點擊「開始誦念」啟動全自動連續語音功能", "本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。"); document.querySelectorAll('.bead').forEach(b=>{ b.className=`bead ${seq[b.id].type}`; }); };
-vSel.onchange=()=>{ if (playing) { synth.cancel(); speak(); } };
+resetBtn.onclick=()=>{ playing=false; synth.cancel(); idx=-1; closingIdx=0; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="開始誦念"; pauseBtn.innerText="暫停"; showPrayer("點擊「開始誦念」啟動全自動連續語音功能", "本系統支援中文語音朗誦（廣東話／國語／普通話），念珠會隨語音進度同步跳動發光。可在上方切換語言與語音。"); document.querySelectorAll('.bead').forEach(b=>{ b.className=`bead ${seq[b.id].type}`; }); };
+function persistVoiceChoice() {
+    try {
+        localStorage.setItem(LANG_PREF_KEY, lSel.value);
+        localStorage.setItem(VOICE_PREF_KEY, vSel.value);
+    } catch (e) {}
+}
+lSel.onchange=()=>{
+    localStorage.setItem(LANG_PREF_KEY, lSel.value);
+    localStorage.removeItem(VOICE_PREF_KEY);
+    loadV();
+    if (playing) { synth.cancel(); speak(); }
+};
+vSel.onchange=()=>{
+    persistVoiceChoice();
+    if (playing) { synth.cancel(); speak(); }
+};
 </script>
 </body>
 </html>
