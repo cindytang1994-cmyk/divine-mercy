@@ -91,7 +91,7 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            text-align: left;
+            text-align: center;
             overflow: hidden;
             border: 1px solid rgba(212,175,55,0.18);
         }
@@ -104,6 +104,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            text-align: center;
         }
         #prayer-text {
             font-size: clamp(0.92rem, 1.5vw, 1.15rem);
@@ -114,6 +115,7 @@
             max-height: calc(1.55em * 5);
             flex: 0 1 auto;
             min-height: 0;
+            text-align: left;
         }
         .right-pane {
             min-width: 0;
@@ -153,7 +155,7 @@
         .divine-mercy-img {
             position: absolute;
             left: 50%;
-            top: 28%;
+            top: 210px;
             transform: translate(-50%, -50%);
             width: 125px;
             height: 185px;
@@ -253,7 +255,7 @@
     <section class="right-pane">
         <div class="rosary-stage" id="rosary-stage">
             <div class="rosary-layout-container" id="beads-container">
-                <img class="divine-mercy-img" src="assets/jesus.JPG?v=20260809" alt="Divine Mercy">
+                <img class="divine-mercy-img" src="assets/jesus.JPG?v=20260809b" alt="Divine Mercy">
             </div>
         </div>
     </section>
@@ -334,7 +336,7 @@ function render(){
     const paterY = aveY + rSmall + lineLen + rSmall;
     const stemYs = [crossY, paterY, aveY, credoY, largeBlueY];
 
-    box.innerHTML = `<img class="divine-mercy-img" src="assets/jesus.JPG?v=20260809" alt="Divine Mercy">`;
+    box.innerHTML = `<img class="divine-mercy-img" src="assets/jesus.JPG?v=20260809b" alt="Divine Mercy">`;
 
     // 四段等長黃線：藍珠↔藍珠↔藍珠↔大藍珠，以及最下段接到十字架
     const stemRadii = [rCross, rSmall, rSmall, rSmall, rLarge];
