@@ -16,6 +16,12 @@
             font-family: "Noto Sans TC", "PingFang HK", "Microsoft JhengHei", sans-serif;
             background-image: radial-gradient(circle at 70% 40%, #1a1a1a 0%, #121212 70%);
         }
+        body.lang-zh-Hans {
+            font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body.lang-en {
+            font-family: "Source Sans 3", "Segoe UI", "Helvetica Neue", sans-serif;
+        }
         .app {
             display: grid;
             grid-template-columns: minmax(220px, 3fr) minmax(320px, 7fr);
@@ -226,7 +232,7 @@
 <body>
 <div class="app">
     <aside class="left-pane">
-        <header><h1>慈悲串經互動朗讀版 · 單屏版</h1></header>
+        <header><h1 id="app-title">慈悲串經互動朗讀版 · 單屏版</h1></header>
         <div class="controls">
             <button id="start-btn">開始誦念</button>
             <button id="pause-btn" disabled>暫停</button>
@@ -234,17 +240,13 @@
         </div>
         <div class="voice-settings">
             <div class="voice-row">
-                <label for="lang-select">語言：</label>
+                <label for="lang-select" id="lang-label">語言：</label>
                 <select id="lang-select">
-                    <option value="yue">廣東話</option>
-                    <option value="zh-TW">國語（台灣）</option>
-                    <option value="zh-CN">普通話（大陸）</option>
-                    <option value="zh-other">其他中文</option>
+                    <option value="zh-Hant-yue">廣東話</option>
+                    <option value="zh-Hant">繁體中文</option>
+                    <option value="zh-Hans">简体中文</option>
+                    <option value="en">English</option>
                 </select>
-            </div>
-            <div class="voice-row">
-                <label for="voice-select">語音：</label>
-                <select id="voice-select"><option value="">載入中…</option></select>
             </div>
         </div>
         <div id="display-panel">
@@ -261,52 +263,191 @@
     </section>
 </div>
 <script>
-const P = {
-    s:{t:"因父、及子、及聖神之名",x:"因父、及子、及聖神之名。亞孟。"},
-    p:{t:"天主經",x:"我們的天父，願祢的名受顯揚；願祢的國來臨；願祢的旨意奉行在人間，如同在天上。求祢今天賞給我們日用的食糧；求祢寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑；但救我們免於凶惡。亞孟。"},
-    m:{t:"聖母經",x:"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。亞孟。"},
-    c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。亞孟。"},
-    e:{t:"永生之父",x:"永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。"},
-    h:{t:"因祂的至悲慘苦難",x:"因祂的至悲慘苦難，求您垂憐我們及普世。"},
-    g:{t:"至聖天主 (結尾三遍)",x:"至聖天主，至聖強有力者，致聖長存者，求您垂憐我們及普世。"},
-    o:{t:"主耶穌，慈悲的君王，我們信賴祢！",x:"主耶穌，慈悲的君王，我們信賴祢！\n\n因父、及子及聖神之名。亞孟。"}
+const PRAYERS = {
+    'zh-Hant': {
+        s:{t:"因父、及子、及聖神之名",x:"因父、及子、及聖神之名。亞孟。"},
+        p:{t:"天主經",x:"我們的天父，願祢的名受顯揚；願祢的國來臨；願祢的旨意奉行在人間，如同在天上。求祢今天賞給我們日用的食糧；求祢寬恕我們的罪過，如同我們寬恕別人一樣；不要讓我們陷於誘惑；但救我們免於凶惡。亞孟。"},
+        m:{t:"聖母經",x:"萬福瑪利亞，妳充滿聖寵。主與妳同在。妳在婦女中受讚頌，妳的親子耶穌同受讚頌。天主聖母瑪利亞，求妳現在和我們臨終時，為我們罪人祈求天主。亞孟。"},
+        c:{t:"信經",x:"我信全能的天主父，天地萬物的創造者。我信父的唯一子，我們的主耶穌基督。祂因聖神降孕，由童貞瑪利亞誕生。祂在比拉多執政時蒙難，被釘在十字架上，死而安葬。祂下降陰府，第三日自死者中復活。祂升了天，坐在全能天主父的右邊。祂要從天降來，審判生者死者。我信聖神。我信聖而公教會，諸聖的相通。罪過的赦免。肉身的復活。永恆的生命。亞孟。"},
+        e:{t:"永生之父",x:"永生之父，我把您至愛之子，我們的主耶穌基督的聖體、聖血、靈魂及天主性奉獻給您，以賠補我們及普世的罪過。"},
+        h:{t:"因祂的至悲慘苦難",x:"因祂的至悲慘苦難，求您垂憐我們及普世。"},
+        g:{t:"至聖天主 (結尾三遍)",x:"至聖天主，至聖強有力者，致聖長存者，求您垂憐我們及普世。"},
+        o:{t:"主耶穌，慈悲的君王，我們信賴祢！",x:"主耶穌，慈悲的君王，我們信賴祢！\n\n因父、及子及聖神之名。亞孟。"}
+    },
+    'zh-Hans': {
+        s:{t:"因父、及子、及圣神之名",x:"因父、及子、及圣神之名。亚孟。"},
+        p:{t:"天主经",x:"我们的天父，愿祢的名受显扬；愿祢的国来临；愿祢的旨意奉行在人间，如同在天上。求祢今天赏给我们日用的食粮；求祢宽恕我们的罪过，如同我们宽恕别人一样；不要让我们陷于诱惑；但救我们免于凶恶。亚孟。"},
+        m:{t:"圣母经",x:"万福玛利亚，妳充满圣宠。主与妳同在。妳在妇女中受赞颂，妳的亲子耶稣同受赞颂。天主圣母玛利亚，求妳现在和我们临终时，为我们罪人祈求天主。亚孟。"},
+        c:{t:"信经",x:"我信全能的天主父，天地万物的创造者。我信父的唯一子，我们的主耶稣基督。祂因圣神降孕，由童贞玛利亚诞生。祂在比拉多执政时蒙难，被钉在十字架上，死而安葬。祂下降阴府，第三日自死者中复活。祂升了天，坐在全能天主父的右边。祂要从天降来，审判生者死者。我信圣神。我信圣而公教会，诸圣的相通。罪过的赦免。肉身的复活。永恒的生命。亚孟。"},
+        e:{t:"永生之父",x:"永生之父，我把您至爱之子，我们的主耶稣基督的圣体、圣血、灵魂及天主性奉献给您，以赔补我们及普世的罪过。"},
+        h:{t:"因祂的至悲惨苦难",x:"因祂的至悲惨苦难，求您垂怜我们及普世。"},
+        g:{t:"至圣天主 (结尾三遍)",x:"至圣天主，至圣强有力者，至圣长存者，求您垂怜我们及普世。"},
+        o:{t:"主耶稣，慈悲的君王，我们信赖祢！",x:"主耶稣，慈悲的君王，我们信赖祢！\n\n因父、及子及圣神之名。亚孟。"}
+    },
+    en: {
+        s:{t:"Sign of the Cross",x:"In the name of the Father, and of the Son, and of the Holy Spirit. Amen."},
+        p:{t:"Our Father",x:"Our Father, who art in heaven, hallowed be Thy name; Thy kingdom come; Thy will be done on earth as it is in heaven. Give us this day our daily bread; and forgive us our trespasses as we forgive those who trespass against us; and lead us not into temptation, but deliver us from evil. Amen."},
+        m:{t:"Hail Mary",x:"Hail Mary, full of grace. The Lord is with thee. Blessed art thou among women, and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen."},
+        c:{t:"The Apostles' Creed",x:"I believe in God, the Father almighty, Creator of heaven and earth, and in Jesus Christ, His only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died and was buried; He descended into hell; on the third day He rose again from the dead; He ascended into heaven, and is seated at the right hand of God the Father almighty; from there He will come to judge the living and the dead. I believe in the Holy Spirit, the holy catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen."},
+        e:{t:"Eternal Father",x:"Eternal Father, I offer You the Body and Blood, Soul and Divinity of Your dearly beloved Son, Our Lord Jesus Christ, in atonement for our sins and those of the whole world."},
+        h:{t:"For the sake of His sorrowful Passion",x:"For the sake of His sorrowful Passion, have mercy on us and on the whole world."},
+        g:{t:"Holy God (three times)",x:"Holy God, Holy Mighty One, Holy Immortal One, have mercy on us and on the whole world."},
+        o:{t:"Jesus, King of Mercy, we trust in You!",x:"Jesus, King of Mercy, we trust in You!\n\nIn the name of the Father, and of the Son, and of the Holy Spirit. Amen."}
+    }
 };
 
-// 重新架構核心排序陣列，確保第1粒大珠處於垂直線頂端與圓環底部交會處
-const seq = [];
-seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x,label:"†"});
-seq.push({id:1,type:"blue-style earlier-small-blue",title:P.p.t,text:P.p.x,label:""});
-seq.push({id:2,type:"blue-style earlier-small-blue",title:P.m.t,text:P.m.x,label:""});
-seq.push({id:3,type:"blue-style earlier-small-blue",title:P.c.t,text:P.c.x,label:""});
-seq.push({id:4,type:"blue-style large-blue",title:`第 1 端 · `+P.e.t,text:`(第 1 端)\n`+P.e.x,label:""});
+const UI = {
+    'zh-Hant': {
+        htmlLang: 'zh-HK',
+        bodyClass: '',
+        title: '慈悲串經互動朗讀版 · 單屏版',
+        start: '開始誦念',
+        pause: '暫停',
+        resume: '繼續',
+        reset: '重設',
+        restart: '重新開始',
+        langLabel: '語言：',
+        idleTitle: '點擊「開始誦念」啟動全自動連續語音功能',
+        idleText: '本系統支援中文語音朗誦（廣東話／國語／普通話）及英語，念珠會隨語音進度同步跳動發光。可在上方切換語言。',
+        langNames: {
+            'zh-Hant-yue': '廣東話',
+            'zh-Hant': '繁體中文',
+            'zh-Hans': '簡體中文',
+            en: 'English'
+        },
+        decadeTitle: (n, t) => `第 ${n} 端 · ${t}`,
+        decadeText: (n, x) => `(第 ${n} 端)\n${x}`,
+        beadText: (b, x) => `(${b}/10)\n${x}`,
+        passText: (n, x) => `(第 ${n} 遍)\n${x}`
+    },
+    'zh-Hans': {
+        htmlLang: 'zh-CN',
+        bodyClass: 'lang-zh-Hans',
+        title: '慈悲串经互动朗读版 · 单屏版',
+        start: '开始诵念',
+        pause: '暂停',
+        resume: '继续',
+        reset: '重设',
+        restart: '重新开始',
+        langLabel: '语言：',
+        idleTitle: '点击「开始诵念」启动全自动连续语音功能',
+        idleText: '本系统支持中文语音朗诵（广东话／国语／普通话）及英语，念珠会随语音进度同步跳动发光。可在上方切换语言。',
+        langNames: {
+            'zh-Hant-yue': '广东话',
+            'zh-Hant': '繁体中文',
+            'zh-Hans': '简体中文',
+            en: 'English'
+        },
+        decadeTitle: (n, t) => `第 ${n} 端 · ${t}`,
+        decadeText: (n, x) => `(第 ${n} 端)\n${x}`,
+        beadText: (b, x) => `(${b}/10)\n${x}`,
+        passText: (n, x) => `(第 ${n} 遍)\n${x}`
+    },
+    en: {
+        htmlLang: 'en',
+        bodyClass: 'lang-en',
+        title: 'Divine Mercy Chaplet · Interactive Reader',
+        start: 'Start',
+        pause: 'Pause',
+        resume: 'Resume',
+        reset: 'Reset',
+        restart: 'Start Again',
+        langLabel: 'Language:',
+        idleTitle: 'Tap “Start” for continuous voice guidance',
+        idleText: 'This app supports Chinese (Cantonese / Mandarin) and English speech. The beads light up in sync with the prayer. Choose a language above.',
+        langNames: {
+            'zh-Hant-yue': 'Cantonese',
+            'zh-Hant': 'Traditional Chinese',
+            'zh-Hans': 'Simplified Chinese',
+            en: 'English'
+        },
+        decadeTitle: (n, t) => `Decade ${n} · ${t}`,
+        decadeText: (n, x) => `(Decade ${n})\n${x}`,
+        beadText: (b, x) => `(${b}/10)\n${x}`,
+        passText: (n, x) => `(${n} of 3)\n${x}`
+    }
+};
 
-// 第1端的10粒小珠
-for(let b=0;b<10;b++) seq.push({id:seq.length,type:"small",title:P.h.t,text:`(${b+1}/10)\n`+P.h.x,label:(b+1).toString()});
-// 其餘4端循環
-for(let d=1;d<5;d++){
-    seq.push({id:seq.length,type:"blue-style large-blue",title:`第 ${d+1} 端 · `+P.e.t,text:`(第 ${d+1} 端)\n`+P.e.x,label:""});
-    for(let b=0;b<10;b++) seq.push({id:seq.length,type:"small",title:P.h.t,text:`(${b+1}/10)\n`+P.h.x,label:(b+1).toString()});
+const LANG_ORDER = ['zh-Hant-yue', 'zh-Hant', 'zh-Hans', 'en'];
+const LANG_META = {
+    'zh-Hant-yue': { ui: 'zh-Hant', prayers: 'zh-Hant', voice: 'yue' },
+    'zh-Hant': { ui: 'zh-Hant', prayers: 'zh-Hant', voice: 'zh-TW' },
+    'zh-Hans': { ui: 'zh-Hans', prayers: 'zh-Hans', voice: 'zh-CN' },
+    en: { ui: 'en', prayers: 'en', voice: 'en' }
+};
+const OLD_LANG_MAP = {
+    yue: 'zh-Hant-yue',
+    'zh-TW': 'zh-Hant',
+    'zh-CN': 'zh-Hans',
+    'zh-other': 'zh-Hant'
+};
+
+let seq = [];
+let closingPrayers = [];
+let idx = -1, playing = false, synth = window.speechSynthesis, utter = null, closingIdx = 0;
+let preferredVoiceName = null;
+
+const startBtn = document.getElementById('start-btn');
+const pauseBtn = document.getElementById('pause-btn');
+const resetBtn = document.getElementById('reset-btn');
+const tDisp = document.getElementById('prayer-title');
+const xDisp = document.getElementById('prayer-text');
+const box = document.getElementById('beads-container');
+const lSel = document.getElementById('lang-select');
+const stage = document.getElementById('rosary-stage');
+const appTitle = document.getElementById('app-title');
+const langLabel = document.getElementById('lang-label');
+const LANG_PREF_KEY = 'pray-lang';
+const VOICE_PREF_KEY = 'pray-voice';
+
+function currentLangKey() {
+    return LANG_META[lSel.value] ? lSel.value : 'zh-Hant-yue';
 }
-let closingPrayers = [{title:P.g.t, text:"(第 1 遍)\n" + P.g.x},{title:P.g.t, text:"(第 2 遍)\n" + P.g.x},{title:P.g.t, text:"(第 3 遍)\n" + P.g.x},{title:P.o.t, text:P.o.x}];
-let idx=-1, playing=false, synth=window.speechSynthesis, utter=null, closingIdx=0;
-const startBtn=document.getElementById('start-btn'), pauseBtn=document.getElementById('pause-btn'), resetBtn=document.getElementById('reset-btn');
-const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container');
-const lSel=document.getElementById('lang-select'), vSel=document.getElementById('voice-select');
-const stage=document.getElementById('rosary-stage');
-const LANG_PREF_KEY='pray-lang', VOICE_PREF_KEY='pray-voice';
-const LANG_ORDER=['yue','zh-TW','zh-CN','zh-other'];
-const LANG_LABELS={yue:'廣東話','zh-TW':'國語（台灣）','zh-CN':'普通話（大陸）','zh-other':'其他中文'};
+function currentMeta() {
+    return LANG_META[currentLangKey()];
+}
+function currentUI() {
+    return UI[currentMeta().ui];
+}
+function currentPrayers() {
+    return PRAYERS[currentMeta().prayers];
+}
+
+function buildSequence() {
+    const P = currentPrayers();
+    const ui = currentUI();
+    seq = [];
+    seq.push({id:0,type:"cross",title:P.s.t,text:P.s.x,label:"†"});
+    seq.push({id:1,type:"blue-style earlier-small-blue",title:P.p.t,text:P.p.x,label:""});
+    seq.push({id:2,type:"blue-style earlier-small-blue",title:P.m.t,text:P.m.x,label:""});
+    seq.push({id:3,type:"blue-style earlier-small-blue",title:P.c.t,text:P.c.x,label:""});
+    seq.push({id:4,type:"blue-style large-blue",title:ui.decadeTitle(1, P.e.t),text:ui.decadeText(1, P.e.x),label:""});
+    for (let b = 0; b < 10; b++) {
+        seq.push({id:seq.length,type:"small",title:P.h.t,text:ui.beadText(b + 1, P.h.x),label:(b + 1).toString()});
+    }
+    for (let d = 1; d < 5; d++) {
+        seq.push({id:seq.length,type:"blue-style large-blue",title:ui.decadeTitle(d + 1, P.e.t),text:ui.decadeText(d + 1, P.e.x),label:""});
+        for (let b = 0; b < 10; b++) {
+            seq.push({id:seq.length,type:"small",title:P.h.t,text:ui.beadText(b + 1, P.h.x),label:(b + 1).toString()});
+        }
+    }
+    closingPrayers = [
+        {title:P.g.t, text:ui.passText(1, P.g.x)},
+        {title:P.g.t, text:ui.passText(2, P.g.x)},
+        {title:P.g.t, text:ui.passText(3, P.g.x)},
+        {title:P.o.t, text:P.o.x}
+    ];
+}
+
 function fitRosary(){
     if (!stage || !box) return;
-    const pad = 16; // keep ring edge and cross inside the stage
+    const pad = 16;
     const sw = stage.clientWidth - pad * 2;
     const sh = stage.clientHeight - pad * 2;
     if (sw <= 0 || sh <= 0) return;
-    // Scale up or down so the ring nearly fills the right pane
     const layoutW = 480, layoutH = 680;
     const scale = Math.min(sw / layoutW, sh / layoutH);
     box.style.transform = `scale(${scale})`;
-    // transform does not change layout box — compensate so the page never scrolls
     const dx = (layoutW * scale - layoutW) / 2;
     const dy = (layoutH * scale - layoutH) / 2;
     box.style.margin = `${dy}px ${dx}px`;
@@ -318,16 +459,14 @@ function showPrayer(title, text){
 function render(){
     const centerX = 240, centerY = 245;
     const ringRadiusX = 205, ringRadiusY = 165, ringSqueeze = 0.22;
-    // 環底大藍珠固定；垂直鏈珠等距，黃線等長並接到每顆藍珠邊緣
-    // centerY kept high enough so the squeezed ring top stays inside the layout
     const largeBlueY = centerY + ringRadiusY * (1 - ringSqueeze);
     const crossY = 622;
     const rLarge = 18, rSmall = 8, rCross = 39;
     const radiiBetween = [
-        rLarge + rSmall, // 大藍珠 → 信經珠
-        rSmall + rSmall, // 信經 → 聖母經
-        rSmall + rSmall, // 聖母經 → 天主經
-        rSmall + rCross  // 天主經 → 十字架
+        rLarge + rSmall,
+        rSmall + rSmall,
+        rSmall + rSmall,
+        rSmall + rCross
     ];
     const totalSpan = crossY - largeBlueY;
     const lineLen = (totalSpan - radiiBetween.reduce((a, b) => a + b, 0)) / radiiBetween.length;
@@ -338,7 +477,6 @@ function render(){
 
     box.innerHTML = `<img class="divine-mercy-img" src="assets/jesus.JPG?v=20260809b" alt="Divine Mercy">`;
 
-    // 四段等長黃線：藍珠↔藍珠↔藍珠↔大藍珠，以及最下段接到十字架
     const stemRadii = [rCross, rSmall, rSmall, rSmall, rLarge];
     for (let s = 0; s < stemYs.length - 1; s++) {
         const topEdge = stemYs[s + 1] + stemRadii[s + 1];
@@ -356,7 +494,6 @@ function render(){
         else if(i === 2) { posX = centerX; posY = aveY; }
         else if(i === 3) { posX = centerX; posY = credoY; }
         else {
-            // 從第 1 粒大珠起全部加入橢圓環；大珠落在環底正中，與垂直鏈相接
             const ringIndex = i - 4;
             const totalRingBeads = seq.length - 4;
             const angle = (ringIndex / totalRingBeads) * 2 * Math.PI + Math.PI / 2;
@@ -370,16 +507,62 @@ function render(){
     fitRosary();
 }
 function update(){ document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); }else b.className=`bead ${seq[i].type}`; }); }
-render();
-window.addEventListener('resize', fitRosary);
+
+function applyUI(showIdle) {
+    const ui = currentUI();
+    document.documentElement.lang = ui.htmlLang;
+    document.body.classList.remove('lang-zh-Hans', 'lang-en');
+    if (ui.bodyClass) document.body.classList.add(ui.bodyClass);
+    document.title = ui.title;
+    appTitle.textContent = ui.title;
+    langLabel.textContent = ui.langLabel;
+    const prev = lSel.value;
+    lSel.innerHTML = '';
+    LANG_ORDER.forEach(k => {
+        const o = document.createElement('option');
+        o.value = k;
+        o.textContent = ui.langNames[k];
+        lSel.appendChild(o);
+    });
+    lSel.value = LANG_META[prev] ? prev : 'zh-Hant-yue';
+    resetBtn.innerText = ui.reset;
+    if (showIdle || (idx === -1 && !playing)) {
+        showPrayer(ui.idleTitle, ui.idleText);
+    }
+}
+
+function refreshControlsForState() {
+    const ui = currentUI();
+    resetBtn.innerText = ui.reset;
+    if (idx === -1 && !playing) {
+        startBtn.innerText = ui.start;
+        pauseBtn.innerText = ui.pause;
+        showPrayer(ui.idleTitle, ui.idleText);
+        return;
+    }
+    if (!playing && idx >= seq.length) {
+        startBtn.innerText = ui.restart;
+        pauseBtn.innerText = ui.pause;
+        return;
+    }
+    if (playing) {
+        startBtn.innerText = ui.start;
+        pauseBtn.innerText = ui.pause;
+    } else {
+        startBtn.innerText = ui.start;
+        pauseBtn.innerText = ui.resume;
+    }
+}
+
 function classifyVoiceLang(v) {
     const lang = (v.lang || '').toLowerCase().replace(/_/g, '-');
     const name = (v.name || '').toLowerCase();
-    const isYue = lang.includes('zh-hk') || lang.includes('yue') || name.includes('cantonese') || name.includes('hong kong') || name.includes('粵語') || name.includes('廣東') || name.includes('sinji');
+    const isYue = lang.includes('zh-hk') || lang.includes('yue') || name.includes('cantonese') || name.includes('hong kong') || name.includes('粵語') || name.includes('廣東') || name.includes('广东') || name.includes('sinji');
     if (isYue) return 'yue';
     if (lang.startsWith('zh-tw') || name.includes('taiwan') || name.includes('meijia') || name.includes('美佳')) return 'zh-TW';
     if (lang.startsWith('zh-cn') || lang === 'zh' || name.includes('chinese (china)') || name.includes('tingting') || name.includes('ting-ting') || name.includes('丽娜') || name.includes('婷婷')) return 'zh-CN';
-    if (lang.startsWith('zh') || name.includes('chinese') || name.includes('mandarin') || name.includes('中文') || name.includes('國語') || name.includes('普通话') || name.includes('普通話')) return 'zh-other';
+    if (lang.startsWith('en')) return 'en';
+    if (lang.startsWith('zh') || name.includes('chinese') || name.includes('mandarin') || name.includes('中文') || name.includes('國語') || name.includes('国语') || name.includes('普通话') || name.includes('普通話')) return 'zh-other';
     return null;
 }
 function scoreVoice(v, langKey) {
@@ -387,95 +570,94 @@ function scoreVoice(v, langKey) {
     let score = 0;
     if (name.includes('Google')) score += 30;
     if (name.includes('Enhanced') || name.includes('Premium') || name.includes('Neural')) score += 20;
-    if (langKey === 'yue' && (name.includes('Sinji') || name.includes('粵語'))) score += 10;
+    if (langKey === 'yue' && (name.includes('Sinji') || name.includes('粵語') || name.includes('粤语'))) score += 10;
+    if (langKey === 'en' && (name.includes('Samantha') || name.includes('Daniel') || name.includes('Karen') || name.includes('Moira'))) score += 8;
     if (v.localService) score += 5;
     return score;
 }
 function voicesForLang(langKey) {
     try {
-        return synth.getVoices().filter(v => classifyVoiceLang(v) === langKey)
-            .sort((a, b) => scoreVoice(b, langKey) - scoreVoice(a, langKey) || a.name.localeCompare(b.name));
+        const voices = synth.getVoices();
+        let list = voices.filter(v => classifyVoiceLang(v) === langKey);
+        if (langKey === 'zh-TW' && list.length === 0) {
+            list = voices.filter(v => classifyVoiceLang(v) === 'zh-other');
+        }
+        if (langKey === 'zh-CN' && list.length === 0) {
+            list = voices.filter(v => ['zh-CN', 'zh-other', 'zh-TW'].includes(classifyVoiceLang(v)));
+        }
+        if (langKey === 'en' && list.length === 0) {
+            list = voices.filter(v => (v.lang || '').toLowerCase().startsWith('en'));
+        }
+        return list.sort((a, b) => scoreVoice(b, langKey) - scoreVoice(a, langKey) || a.name.localeCompare(b.name));
     } catch (e) { return []; }
 }
 function getAssignedVoice() {
     try {
         const voices = synth.getVoices();
-        const selected = voices.find(x => x.name === vSel.value);
-        if (selected) return selected;
-        const list = voicesForLang(lSel.value);
-        return list[0] || voices.find(v => classifyVoiceLang(v)) || null;
+        const voiceKey = currentMeta().voice;
+        if (preferredVoiceName) {
+            const saved = voices.find(x => x.name === preferredVoiceName && classifyVoiceLang(x) === voiceKey);
+            if (saved) return saved;
+        }
+        const list = voicesForLang(voiceKey);
+        return list[0] || voices.find(v => classifyVoiceLang(v) === voiceKey) || null;
     } catch (e) { return null; }
 }
 function loadV() {
     try {
         const voices = synth.getVoices();
         if (!voices || voices.length === 0) return;
-
-        const available = LANG_ORDER.filter(k => voicesForLang(k).length > 0);
-        if (available.length === 0) {
-            vSel.innerHTML = '<option value="">此裝置未找到中文語音</option>';
-            return;
-        }
-
-        const savedLang = localStorage.getItem(LANG_PREF_KEY);
-        const prevLang = lSel.value;
-        const langPick = available.includes(savedLang) ? savedLang
-            : (available.includes(prevLang) ? prevLang : available[0]);
-
-        lSel.innerHTML = '';
-        available.forEach(k => {
-            const o = document.createElement('option');
-            o.value = k;
-            o.textContent = LANG_LABELS[k];
-            lSel.appendChild(o);
-        });
-        lSel.value = langPick;
-
-        const list = voicesForLang(langPick);
+        const voiceKey = currentMeta().voice;
+        const list = voicesForLang(voiceKey);
         const savedVoice = localStorage.getItem(VOICE_PREF_KEY);
-        const prevVoice = vSel.value;
-        vSel.innerHTML = '';
-        list.forEach(x => {
-            const o = document.createElement('option');
-            o.value = x.name;
-            o.textContent = x.name;
-            vSel.appendChild(o);
-        });
-        const keep = list.find(x => x.name === prevVoice) || list.find(x => x.name === savedVoice);
-        vSel.value = keep ? keep.name : list[0].name;
-
-        localStorage.setItem(LANG_PREF_KEY, lSel.value);
-        localStorage.setItem(VOICE_PREF_KEY, vSel.value);
+        preferredVoiceName = list.find(x => x.name === savedVoice)?.name || list[0]?.name || null;
+        if (preferredVoiceName) localStorage.setItem(VOICE_PREF_KEY, preferredVoiceName);
     } catch (e) {}
 }
-if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
-setTimeout(loadV, 300); setTimeout(loadV, 800);
+function migrateLangPref(saved) {
+    if (!saved) return null;
+    if (LANG_META[saved]) return saved;
+    return OLD_LANG_MAP[saved] || null;
+}
+function initLangSelect() {
+    const saved = migrateLangPref(localStorage.getItem(LANG_PREF_KEY));
+    lSel.value = saved && LANG_META[saved] ? saved : 'zh-Hant-yue';
+    localStorage.setItem(LANG_PREF_KEY, lSel.value);
+}
 function isAppleChineseVoice(voiceObj) {
     const name = voiceObj ? (voiceObj.name || '') : '';
     if (name.includes('Sinji') || name.includes('Meijia') || name.includes('Tingting') || name.includes('Ting-Ting') || name.includes('Apple')) return true;
     return !name && /iPhone|iPad|Macintosh/i.test(navigator.userAgent);
 }
 function optimizeTextForVoice(rawText, voiceObj) {
-    let clean = rawText.replace(/\(\d+\/\d+\)/g, '').replace(/\(第\s*\d+\s*[端遍]\)/g, '');
+    let clean = rawText
+        .replace(/\(\d+\/\d+\)/g, '')
+        .replace(/\(第\s*\d+\s*[端遍]\)/g, '')
+        .replace(/\(Decade\s*\d+\)/gi, '')
+        .replace(/\(\d+\s+of\s+3\)/gi, '');
     const voiceName = voiceObj ? voiceObj.name : '';
-    const langKey = classifyVoiceLang(voiceObj) || lSel.value;
+    const langKey = classifyVoiceLang(voiceObj) || currentMeta().voice;
+    if (langKey === 'en') return clean.trim();
     clean = clean.replace(/妳的/g, '祢的').replace(/妳/g, '祢');
-    if (voiceName.includes('Google') || vSel.value.includes('Google')) {
+    if (voiceName.includes('Google') || (preferredVoiceName || '').includes('Google')) {
         if (langKey === 'yue') {
-            clean = clean.replace(/聖神/g, '聖臣').replace(/垂憐/g, '誰憐').replace(/及普世/g, '同普世');
+            clean = clean.replace(/聖神/g, '聖臣').replace(/圣神/g, '圣臣')
+                .replace(/垂憐/g, '誰憐').replace(/垂怜/g, '谁怜')
+                .replace(/及普世/g, '同普世');
         }
     } else if (langKey === 'yue' && isAppleChineseVoice(voiceObj)) {
-        clean = clean.replace(/亞孟/g, '呀免');
+        clean = clean.replace(/亞孟/g, '呀免').replace(/亚孟/g, '呀免');
     }
-    return clean;
+    return clean.trim();
 }
 function speakWithAssignedVoice(text, onDone) {
     loadV();
     const v = getAssignedVoice();
     const optimizedText = optimizeTextForVoice(text, v);
     utter = new SpeechSynthesisUtterance(optimizedText);
-    const langFallback = { yue: 'zh-HK', 'zh-TW': 'zh-TW', 'zh-CN': 'zh-CN', 'zh-other': 'zh-TW' };
-    utter.lang = (v && v.lang) ? v.lang : (langFallback[lSel.value] || 'zh-HK');
+    const langFallback = { yue: 'zh-HK', 'zh-TW': 'zh-TW', 'zh-CN': 'zh-CN', en: 'en-US' };
+    const voiceKey = currentMeta().voice;
+    utter.lang = (v && v.lang) ? v.lang : (langFallback[voiceKey] || 'zh-HK');
     if (v) utter.voice = v;
     utter.rate = 0.85;
     utter.onend = () => { if (playing) onDone(); };
@@ -484,7 +666,6 @@ function speakWithAssignedVoice(text, onDone) {
         if (e.error === 'interrupted' || e.error === 'canceled') return;
         setTimeout(() => { if (playing) onDone(); }, 400);
     };
-    // Chrome can drop speak() if called in the same turn as cancel()
     setTimeout(() => { if (playing) synth.speak(utter); }, 40);
 }
 function speak(){
@@ -505,7 +686,13 @@ function speakClosingSequence() {
     document.querySelectorAll('.bead').forEach(b => b.classList.remove('active'));
     speakWithAssignedVoice(cp.text, () => { closingIdx++; setTimeout(speakClosingSequence, 150); });
 }
-function endRosary() { playing=false; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="重新開始"; closingIdx=0; }
+function endRosary() {
+    playing = false;
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    startBtn.innerText = currentUI().restart;
+    closingIdx = 0;
+}
 function jump(i){ idx=i; const b=seq[idx]; showPrayer(b.title, b.text); update(); }
 function beginReadingFrom(i){
     synth.cancel();
@@ -514,28 +701,64 @@ function beginReadingFrom(i){
     playing = true;
     startBtn.disabled = true;
     pauseBtn.disabled = false;
-    pauseBtn.innerText = "暫停";
+    pauseBtn.innerText = currentUI().pause;
     speak();
 }
-startBtn.onclick=()=>{ if(!playing){ beginReadingFrom(idx===-1||idx>=seq.length ? 0 : idx); } };
-pauseBtn.onclick=()=>{ if(playing){ playing=false; synth.cancel(); pauseBtn.innerText="繼續"; } else { playing=true; pauseBtn.innerText="暫停"; if(idx>=seq.length){ speakClosingSequence(); } else { speak(); } } };
-resetBtn.onclick=()=>{ playing=false; synth.cancel(); idx=-1; closingIdx=0; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="開始誦念"; pauseBtn.innerText="暫停"; showPrayer("點擊「開始誦念」啟動全自動連續語音功能", "本系統支援中文語音朗誦（廣東話／國語／普通話），念珠會隨語音進度同步跳動發光。可在上方切換語言與語音。"); document.querySelectorAll('.bead').forEach(b=>{ b.className=`bead ${seq[b.id].type}`; }); };
-function persistVoiceChoice() {
-    try {
-        localStorage.setItem(LANG_PREF_KEY, lSel.value);
-        localStorage.setItem(VOICE_PREF_KEY, vSel.value);
-    } catch (e) {}
+function applyLanguage(showIdle) {
+    buildSequence();
+    render();
+    applyUI(!!showIdle);
+    refreshControlsForState();
+    if (idx >= 0 && idx < seq.length) {
+        showPrayer(seq[idx].title, seq[idx].text);
+        update();
+    } else if (idx >= seq.length && closingIdx > 0 && closingIdx <= closingPrayers.length) {
+        const cp = closingPrayers[Math.min(closingIdx, closingPrayers.length - 1)];
+        showPrayer(cp.title, cp.text);
+    }
+    loadV();
 }
+
+startBtn.onclick=()=>{ if(!playing){ beginReadingFrom(idx===-1||idx>=seq.length ? 0 : idx); } };
+pauseBtn.onclick=()=>{
+    const ui = currentUI();
+    if(playing){
+        playing=false;
+        synth.cancel();
+        pauseBtn.innerText=ui.resume;
+    } else {
+        playing=true;
+        pauseBtn.innerText=ui.pause;
+        if(idx>=seq.length){ speakClosingSequence(); } else { speak(); }
+    }
+};
+resetBtn.onclick=()=>{
+    const ui = currentUI();
+    playing=false;
+    synth.cancel();
+    idx=-1;
+    closingIdx=0;
+    startBtn.disabled=false;
+    pauseBtn.disabled=true;
+    startBtn.innerText=ui.start;
+    pauseBtn.innerText=ui.pause;
+    showPrayer(ui.idleTitle, ui.idleText);
+    document.querySelectorAll('.bead').forEach(b=>{ b.className=`bead ${seq[b.id].type}`; });
+};
+
 lSel.onchange=()=>{
     localStorage.setItem(LANG_PREF_KEY, lSel.value);
     localStorage.removeItem(VOICE_PREF_KEY);
-    loadV();
+    preferredVoiceName = null;
+    applyLanguage(idx === -1 && !playing);
     if (playing) { synth.cancel(); speak(); }
 };
-vSel.onchange=()=>{
-    persistVoiceChoice();
-    if (playing) { synth.cancel(); speak(); }
-};
+
+initLangSelect();
+applyLanguage(true);
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
+setTimeout(loadV, 300); setTimeout(loadV, 800);
+window.addEventListener('resize', fitRosary);
 </script>
 </body>
 </html>
