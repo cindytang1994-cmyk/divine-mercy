@@ -309,12 +309,6 @@ const UI = {
         langLabel: '語言：',
         idleTitle: '點擊「開始誦念」啟動全自動連續語音功能',
         idleText: '本系統支援中文語音朗誦（廣東話／國語／普通話）及英語，念珠會隨語音進度同步跳動發光。可在上方切換語言。',
-        langNames: {
-            'zh-Hant-yue': '廣東話',
-            'zh-Hant': '繁體中文',
-            'zh-Hans': '簡體中文',
-            en: 'English'
-        },
         decadeTitle: (n, t) => `第 ${n} 端 · ${t}`,
         decadeText: (n, x) => `(第 ${n} 端)\n${x}`,
         beadText: (b, x) => `(${b}/10)\n${x}`,
@@ -332,12 +326,6 @@ const UI = {
         langLabel: '语言：',
         idleTitle: '点击「开始诵念」启动全自动连续语音功能',
         idleText: '本系统支持中文语音朗诵（广东话／国语／普通话）及英语，念珠会随语音进度同步跳动发光。可在上方切换语言。',
-        langNames: {
-            'zh-Hant-yue': '广东话',
-            'zh-Hant': '繁体中文',
-            'zh-Hans': '简体中文',
-            en: 'English'
-        },
         decadeTitle: (n, t) => `第 ${n} 端 · ${t}`,
         decadeText: (n, x) => `(第 ${n} 端)\n${x}`,
         beadText: (b, x) => `(${b}/10)\n${x}`,
@@ -355,12 +343,6 @@ const UI = {
         langLabel: 'Language:',
         idleTitle: 'Tap “Start” for continuous voice guidance',
         idleText: 'This app supports Chinese (Cantonese / Mandarin) and English speech. The beads light up in sync with the prayer. Choose a language above.',
-        langNames: {
-            'zh-Hant-yue': 'Cantonese',
-            'zh-Hant': 'Traditional Chinese',
-            'zh-Hans': 'Simplified Chinese',
-            en: 'English'
-        },
         decadeTitle: (n, t) => `Decade ${n} · ${t}`,
         decadeText: (n, x) => `(Decade ${n})\n${x}`,
         beadText: (b, x) => `(${b}/10)\n${x}`,
@@ -369,6 +351,13 @@ const UI = {
 };
 
 const LANG_ORDER = ['zh-Hant-yue', 'zh-Hant', 'zh-Hans', 'en'];
+// Option labels stay in the language they represent (do not translate with UI).
+const LANG_LABELS = {
+    'zh-Hant-yue': '廣東話',
+    'zh-Hant': '繁體中文',
+    'zh-Hans': '简体中文',
+    en: 'English'
+};
 const LANG_META = {
     'zh-Hant-yue': { ui: 'zh-Hant', prayers: 'zh-Hant', voice: 'yue' },
     'zh-Hant': { ui: 'zh-Hant', prayers: 'zh-Hant', voice: 'zh-TW' },
@@ -521,7 +510,7 @@ function applyUI(showIdle) {
     LANG_ORDER.forEach(k => {
         const o = document.createElement('option');
         o.value = k;
-        o.textContent = ui.langNames[k];
+        o.textContent = LANG_LABELS[k];
         lSel.appendChild(o);
     });
     lSel.value = LANG_META[prev] ? prev : 'zh-Hant-yue';
