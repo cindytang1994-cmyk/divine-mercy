@@ -56,8 +56,7 @@
         <div class="rosary-line line-3"></div>
         <div class="rosary-line line-4"></div>
         
-        <!-- 採用最通用的天主教官方高清慈悲耶穌原畫連結（解決破圖不顯示問題） -->
-        <img class="divine-mercy-img" src="https://wikimedia.org" alt="Divine Mercy" onerror="this.src='https://catholicprayersonline.com'">
+        <img class="divine-mercy-img" src="assets/divine-mercy.jpg" alt="Divine Mercy">
     </div>
 </div>
 <script>
@@ -96,7 +95,13 @@ function render(){
     // 核心修正 2：精密重算 Y 軸坐標（566 -> 492 -> 442 -> 396 -> 350），拉開完全均等、不重疊的垂直等距空間
     const crossY = 566, paterY = 492, aveY = 442, credoY = 396, loopBaseLargeBeadY = 350;
     
-    box.innerHTML='';
+    box.innerHTML = `
+        <div class="rosary-line line-1"></div>
+        <div class="rosary-line line-2"></div>
+        <div class="rosary-line line-3"></div>
+        <div class="rosary-line line-4"></div>
+        <img class="divine-mercy-img" src="assets/divine-mercy.jpg" alt="Divine Mercy">
+    `;
     seq.forEach((b,i)=>{
         const el=document.createElement('div'); el.className=`bead ${b.type}`; el.innerHTML=b.label; let posX = centerX, posY = crossY;
         if(i === 0) { posX = centerX; posY = crossY; } 
@@ -105,7 +110,7 @@ function render(){
         else if(i === 3) { posX = centerX; posY = credoY; } 
         else if(i === 4) { 
             // 第一粒大珠精密定位在大圓環的最底部中央（即與開端直線交接之處）
-            posX = centerX; posY = loopBaseBeadY;
+            posX = centerX; posY = loopBaseLargeBeadY;
         }
         else {
             // 其餘 49 顆念珠圍繞成大圓環，半徑左右拉寬，徹底避開正中央的聖像
