@@ -2,7 +2,10 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>慈悲串經互動朗讀版 - divine-mercy</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>慈悲串經互動朗讀版 · 單屏版</title>
     <style>
         :root { --p-gold: #d4af37; --bg: #121212; --panel: #1e1e1e; --txt: #f0f0f0; --glow: rgba(212, 175, 55, 0.8); }
         * { box-sizing: border-box; }
@@ -205,7 +208,7 @@
 <body>
 <div class="app">
     <aside class="left-pane">
-        <header><h1>慈悲串經互動朗讀版</h1></header>
+        <header><h1>慈悲串經互動朗讀版 · 單屏版</h1></header>
         <div class="controls">
             <button id="start-btn">開始誦念</button>
             <button id="pause-btn" disabled>暫停</button>
@@ -223,7 +226,7 @@
     <section class="right-pane">
         <div class="rosary-stage" id="rosary-stage">
             <div class="rosary-layout-container" id="beads-container">
-                <img class="divine-mercy-img" src="assets/jesus.JPG" alt="Divine Mercy">
+                <img class="divine-mercy-img" src="assets/jesus.JPG?v=20260809" alt="Divine Mercy">
             </div>
         </div>
     </section>
@@ -300,7 +303,7 @@ function render(){
     const paterY = aveY + rSmall + lineLen + rSmall;
     const stemYs = [crossY, paterY, aveY, credoY, largeBlueY];
 
-    box.innerHTML = `<img class="divine-mercy-img" src="assets/jesus.JPG" alt="Divine Mercy">`;
+    box.innerHTML = `<img class="divine-mercy-img" src="assets/jesus.JPG?v=20260809" alt="Divine Mercy">`;
 
     // 四段等長黃線：藍珠↔藍珠↔藍珠↔大藍珠，以及最下段接到十字架
     const stemRadii = [rCross, rSmall, rSmall, rSmall, rLarge];
