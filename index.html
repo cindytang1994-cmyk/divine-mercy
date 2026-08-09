@@ -629,14 +629,16 @@ function optimizeTextForVoice(rawText, voiceObj) {
     const langKey = classifyVoiceLang(voiceObj) || currentMeta().voice;
     if (langKey === 'en') return clean.trim();
     clean = clean.replace(/妳的/g, '祢的').replace(/妳/g, '祢');
-    if (voiceName.includes('Google') || (preferredVoiceName || '').includes('Google')) {
-        if (langKey === 'yue') {
+    if (langKey === 'yue') {
+        // Force ming4 (名 is often misread by TTS; 明 = ming4)
+        clean = clean.replace(/名/g, '明');
+        if (voiceName.includes('Google') || (preferredVoiceName || '').includes('Google')) {
             clean = clean.replace(/聖神/g, '聖臣').replace(/圣神/g, '圣臣')
                 .replace(/垂憐/g, '誰憐').replace(/垂怜/g, '谁怜')
                 .replace(/及普世/g, '同普世');
+        } else if (isAppleChineseVoice(voiceObj)) {
+            clean = clean.replace(/阿們/g, '呀免').replace(/阿们/g, '呀免').replace(/亞孟/g, '呀免').replace(/亚孟/g, '呀免');
         }
-    } else if (langKey === 'yue' && isAppleChineseVoice(voiceObj)) {
-        clean = clean.replace(/阿們/g, '呀免').replace(/阿们/g, '呀免').replace(/亞孟/g, '呀免').replace(/亚孟/g, '呀免');
     }
     return clean.trim();
 }
