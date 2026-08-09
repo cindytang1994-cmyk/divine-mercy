@@ -200,8 +200,18 @@
                 flex: 0 0 auto;
             }
             #prayer-text { max-height: calc(1.55em * 3); }
-            h1 { font-size: 1.05rem; }
-            button { padding: 8px 14px; font-size: 0.85rem; }
+            h1 { font-size: 1.05rem; text-align: center; }
+            .controls {
+                width: 100%;
+                flex-wrap: nowrap;
+                gap: 8px;
+            }
+            .controls button {
+                flex: 1 1 0;
+                min-width: 0;
+                padding: 8px 6px;
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
