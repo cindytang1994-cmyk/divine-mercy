@@ -5,59 +5,228 @@
     <title>慈悲串經互動朗讀版 - divine-mercy</title>
     <style>
         :root { --p-gold: #d4af37; --bg: #121212; --panel: #1e1e1e; --txt: #f0f0f0; --glow: rgba(212, 175, 55, 0.8); }
-        body { margin:0; padding:0; background:var(--bg); color:var(--txt); font-family:sans-serif; display:flex; flex-direction:column; background-image: radial-gradient(circle at center, #1a1a1a 0%, #121212 100%); min-height:100vh; align-items: center; }
-        header { text-align:center; padding:20px; background:var(--panel); width:100%; box-shadow:0 2px 10px rgba(0,0,0,0.5); }
-        h1 { margin:0; color:var(--p-gold); font-size:1.8rem; }
-        .container { display:flex; flex-direction:column; align-items:center; width:100%; max-width:850px; padding:20px; box-sizing:border-box; margin: 0 auto; }
-        .controls { margin-bottom:20px; display:flex; gap:15px; }
-        button { background:var(--p-gold); color:#000; border:none; padding:12px 24px; font-size:1rem; font-weight:bold; border-radius:25px; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.3); }
+        * { box-sizing: border-box; }
+        html, body { margin:0; padding:0; height:100%; overflow:hidden; }
+        body {
+            background: var(--bg);
+            color: var(--txt);
+            font-family: "Noto Sans TC", "PingFang HK", "Microsoft JhengHei", sans-serif;
+            background-image: radial-gradient(circle at 70% 40%, #1a1a1a 0%, #121212 70%);
+        }
+        .app {
+            display: grid;
+            grid-template-columns: minmax(220px, 3fr) minmax(320px, 7fr);
+            gap: 16px;
+            height: 100dvh;
+            max-height: 100dvh;
+            padding: 32px 18px;
+            overflow: hidden;
+        }
+        .left-pane {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 0;
+            min-height: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        header { flex: 0 0 auto; }
+        h1 {
+            margin: 0;
+            color: var(--p-gold);
+            font-size: clamp(1.15rem, 2.2vw, 1.7rem);
+            line-height: 1.25;
+            letter-spacing: 0.02em;
+        }
+        .controls { display:flex; flex-wrap:wrap; gap:10px; flex: 0 0 auto; }
+        button {
+            background: var(--p-gold);
+            color: #000;
+            border: none;
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
         button:disabled { background:#555; color:#888; cursor:not-allowed; }
-        #display-panel { background:var(--panel); border-radius:15px; padding:25px; width:100%; box-sizing:border-box; text-align:center; margin-bottom:30px; min-height:150px; display:flex; flex-direction:column; justify-content:center; }
-        #prayer-title { color:var(--p-gold); font-size:1.4rem; margin:0 0 10px 0; }
-        #prayer-text { font-size:1.2rem; line-height:1.6; margin:0; white-space:pre-line; }
-        
-        .voice-settings { margin-top:15px; margin-bottom:70px; font-size:0.9rem; color:#aaa; text-align: center; }
-        select { background:#333; color:#fff; border:1px solid #555; padding:5px 10px; border-radius:5px; margin-left: 5px; }
-        
-        /* 念珠置中大畫布位置 */
-        .rosary-layout-container { position:relative; width:480px; height:600px; margin:0 auto; display: block; }
-        
-        /* 核心優化 1：建立 4 條完全獨立、均勻等距的金色實體 [I] 連接線 */
-        .rosary-line { position: absolute; left: 240px; width: 2px; background: linear-gradient(to bottom, var(--p-gold), #b89b4d); transform: translateX(-50%); z-index: 4; pointer-events: none; opacity: 0.9; box-shadow: 0 0 4px rgba(212,175,55,0.4); }
-        .line-1 { top: 512px; height: 26px; } /* 十字架 ── 1珠 */
-        .line-2 { top: 462px; height: 16px; } /* 1珠 ── 2珠 */
-        .line-3 { top: 416px; height: 16px; } /* 2珠 ── 3珠 */
-        .line-4 { top: 370px; height: 16px; } /* 3珠 ── 第一粒大珠 */
-        
-        /* 高清不破損慈悲聖像樣式：完美置於圓環中央且拉開距離 */
-        .divine-mercy-img { position:absolute; left:50%; top:28%; transform:translate(-50%, -50%); width:125px; height:185px; border-radius:10px; object-fit:cover; box-shadow:0 0 25px rgba(212,175,55,0.25), 0 4px 15px rgba(0,0,0,0.8); border:1px solid rgba(212,175,55,0.4); z-index:1; pointer-events:none; background:#16161c; }
-        
-        .bead { position:absolute; width:22px; height:22px; border-radius:50%; background:#444; border:2px solid #666; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:bold; color:#aaa; cursor:pointer; transition:all 0.2s; transform:translate(-50%, -50%); z-index:6; }
-        .bead.cross { width:54px; height:54px; border-radius:10px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:1.8rem; z-index:10; }
+        .voice-settings {
+            flex: 0 0 auto;
+            font-size: 0.85rem;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+        .voice-settings label { white-space: nowrap; }
+        select {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 5px 8px;
+            border-radius: 5px;
+            max-width: 100%;
+            min-width: 0;
+            flex: 1;
+        }
+        #display-panel {
+            background: var(--panel);
+            border-radius: 14px;
+            padding: 12px 14px;
+            flex: 0 1 auto;
+            max-height: 70%;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            text-align: left;
+            overflow: hidden;
+            border: 1px solid rgba(212,175,55,0.18);
+        }
+        #prayer-title {
+            color: var(--p-gold);
+            font-size: clamp(1rem, 1.8vw, 1.35rem);
+            margin: 0 0 8px 0;
+            flex: 0 0 auto;
+            line-height: 1.35;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #prayer-text {
+            font-size: clamp(0.92rem, 1.5vw, 1.15rem);
+            line-height: 1.55;
+            margin: 0;
+            white-space: pre-line;
+            overflow: hidden;
+            max-height: calc(1.55em * 5);
+            flex: 0 1 auto;
+            min-height: 0;
+        }
+        .right-pane {
+            min-width: 0;
+            min-height: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .rosary-stage {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .rosary-layout-container {
+            position: relative;
+            width: 480px;
+            height: 680px;
+            flex: 0 0 auto;
+            transform-origin: center center;
+        }
+        .rosary-line {
+            position: absolute;
+            left: 240px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--p-gold), #b89b4d);
+            transform: translateX(-50%);
+            z-index: 4;
+            pointer-events: none;
+            opacity: 0.9;
+            box-shadow: 0 0 4px rgba(212,175,55,0.4);
+        }
+        .divine-mercy-img {
+            position: absolute;
+            left: 50%;
+            top: 28%;
+            transform: translate(-50%, -50%);
+            width: 125px;
+            height: 185px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 0 25px rgba(212,175,55,0.25), 0 4px 15px rgba(0,0,0,0.8);
+            border: 1px solid rgba(212,175,55,0.4);
+            z-index: 1;
+            pointer-events: none;
+            background: #16161c;
+        }
+        .bead {
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #444;
+            border: 2px solid #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.2s;
+            transform: translate(-50%, -50%);
+            z-index: 6;
+        }
+        .bead.cross { width:78px; height:78px; border-radius:12px; background:#5a4a3a; border-color:#8b7355; color:#e6c280; font-size:2.6rem; z-index:10; }
         .bead.blue-style { background:#2a4d69; border-color:#4b86b4; color:#adcbe3; font-size:0rem; }
         .bead.large-blue { width:36px; height:36px; }
         .bead.earlier-small-blue { width:16px; height:16px; }
-        
         .bead.active { background:var(--p-gold)!important; border-color:#fff!important; color:#000!important; font-size:0.65rem; animation:pulse 0.8s infinite alternate; z-index:12; }
-        @keyframes pulse { 0% { transform:translate(-50%, -50%) scale(1); box-shadow:0 0 8px var(--glow); } 100% { transform:translate(-50%, -50%) scale(1.3); box-shadow:0 0 25px var(--glow), 0 0 35px var(--p-gold); } }
+        @keyframes pulse {
+            0% { transform:translate(-50%, -50%) scale(1); box-shadow:0 0 8px var(--glow); }
+            100% { transform:translate(-50%, -50%) scale(1.3); box-shadow:0 0 25px var(--glow), 0 0 35px var(--p-gold); }
+        }
+        @media (max-width: 820px) {
+            .app {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto minmax(0, 1fr);
+                gap: 8px;
+                padding: 10px 12px 12px;
+            }
+            .left-pane { gap: 6px; height: auto; overflow: visible; }
+            #display-panel {
+                padding: 8px 10px;
+                max-height: none;
+                flex: 0 0 auto;
+            }
+            #prayer-text { max-height: calc(1.55em * 3); }
+            h1 { font-size: 1.05rem; }
+            button { padding: 8px 14px; font-size: 0.85rem; }
+        }
     </style>
 </head>
 <body>
-<header><h1>慈悲串經互動朗讀版</h1></header>
-<div class="container">
-    <div class="controls"><button id="start-btn">開始誦念</button><button id="pause-btn" disabled>暫停</button><button id="reset-btn">重設</button></div>
-    <div id="display-panel"><h2 id="prayer-title">點擊「開始誦念」啟動全自動連續語音功能</h2><p id="prayer-text">本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。</p></div>
-    <div class="voice-settings"><label>廣東話語音：</label><select id="voice-select"><option value="Google 粵語（香港）">廣東話 - Google 粵語（香港）</option></select></div>
-    
-    <div class="rosary-layout-container" id="beads-container">
-        <!-- 4條獨立金色連接線 [I] -->
-        <div class="rosary-line line-1"></div>
-        <div class="rosary-line line-2"></div>
-        <div class="rosary-line line-3"></div>
-        <div class="rosary-line line-4"></div>
-        
-        <img class="divine-mercy-img" src="assets/divine-mercy.jpg" alt="Divine Mercy">
-    </div>
+<div class="app">
+    <aside class="left-pane">
+        <header><h1>慈悲串經互動朗讀版</h1></header>
+        <div class="controls">
+            <button id="start-btn">開始誦念</button>
+            <button id="pause-btn" disabled>暫停</button>
+            <button id="reset-btn">重設</button>
+        </div>
+        <div class="voice-settings">
+            <label for="voice-select">廣東話語音：</label>
+            <select id="voice-select"><option value="Google 粵語（香港）">廣東話 - Google 粵語（香港）</option></select>
+        </div>
+        <div id="display-panel">
+            <h2 id="prayer-title">點擊「開始誦念」啟動全自動連續語音功能</h2>
+            <p id="prayer-text">本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。</p>
+        </div>
+    </aside>
+    <section class="right-pane">
+        <div class="rosary-stage" id="rosary-stage">
+            <div class="rosary-layout-container" id="beads-container">
+                <img class="divine-mercy-img" src="assets/jesus.JPG" alt="Divine Mercy">
+            </div>
+        </div>
+    </section>
 </div>
 <script>
 const P = {
@@ -90,86 +259,187 @@ let closingPrayers = [{title:P.g.t, text:"(第 1 遍)\n" + P.g.x},{title:P.g.t, 
 let idx=-1, playing=false, synth=window.speechSynthesis, utter=null, closingIdx=0;
 const startBtn=document.getElementById('start-btn'), pauseBtn=document.getElementById('pause-btn'), resetBtn=document.getElementById('reset-btn');
 const tDisp=document.getElementById('prayer-title'), xDisp=document.getElementById('prayer-text'), box=document.getElementById('beads-container'), vSel=document.getElementById('voice-select');
+const stage=document.getElementById('rosary-stage');
+function fitRosary(){
+    if (!stage || !box) return;
+    const pad = 16; // keep ring edge and cross inside the stage
+    const sw = stage.clientWidth - pad * 2;
+    const sh = stage.clientHeight - pad * 2;
+    if (sw <= 0 || sh <= 0) return;
+    // Scale up or down so the ring nearly fills the right pane
+    const layoutW = 480, layoutH = 680;
+    const scale = Math.min(sw / layoutW, sh / layoutH);
+    box.style.transform = `scale(${scale})`;
+    // transform does not change layout box — compensate so the page never scrolls
+    const dx = (layoutW * scale - layoutW) / 2;
+    const dy = (layoutH * scale - layoutH) / 2;
+    box.style.margin = `${dy}px ${dx}px`;
+}
+function showPrayer(title, text){
+    tDisp.innerText = title;
+    xDisp.innerText = text;
+}
 function render(){
-    const centerX = 240, centerY = 175; 
-    // 核心修正 2：精密重算 Y 軸坐標（566 -> 492 -> 442 -> 396 -> 350），拉開完全均等、不重疊的垂直等距空間
-    const crossY = 566, paterY = 492, aveY = 442, credoY = 396, loopBaseLargeBeadY = 350;
-    
-    box.innerHTML = `
-        <div class="rosary-line line-1"></div>
-        <div class="rosary-line line-2"></div>
-        <div class="rosary-line line-3"></div>
-        <div class="rosary-line line-4"></div>
-        <img class="divine-mercy-img" src="assets/divine-mercy.jpg" alt="Divine Mercy">
-    `;
+    const centerX = 240, centerY = 245;
+    const ringRadiusX = 205, ringRadiusY = 165, ringSqueeze = 0.22;
+    // 環底大藍珠固定；垂直鏈珠等距，黃線等長並接到每顆藍珠邊緣
+    // centerY kept high enough so the squeezed ring top stays inside the layout
+    const largeBlueY = centerY + ringRadiusY * (1 - ringSqueeze);
+    const crossY = 622;
+    const rLarge = 18, rSmall = 8, rCross = 39;
+    const radiiBetween = [
+        rLarge + rSmall, // 大藍珠 → 信經珠
+        rSmall + rSmall, // 信經 → 聖母經
+        rSmall + rSmall, // 聖母經 → 天主經
+        rSmall + rCross  // 天主經 → 十字架
+    ];
+    const totalSpan = crossY - largeBlueY;
+    const lineLen = (totalSpan - radiiBetween.reduce((a, b) => a + b, 0)) / radiiBetween.length;
+    const credoY = largeBlueY + rLarge + lineLen + rSmall;
+    const aveY = credoY + rSmall + lineLen + rSmall;
+    const paterY = aveY + rSmall + lineLen + rSmall;
+    const stemYs = [crossY, paterY, aveY, credoY, largeBlueY];
+
+    box.innerHTML = `<img class="divine-mercy-img" src="assets/jesus.JPG" alt="Divine Mercy">`;
+
+    // 四段等長黃線：藍珠↔藍珠↔藍珠↔大藍珠，以及最下段接到十字架
+    const stemRadii = [rCross, rSmall, rSmall, rSmall, rLarge];
+    for (let s = 0; s < stemYs.length - 1; s++) {
+        const topEdge = stemYs[s + 1] + stemRadii[s + 1];
+        const line = document.createElement('div');
+        line.className = 'rosary-line';
+        line.style.top = `${topEdge}px`;
+        line.style.height = `${lineLen}px`;
+        box.appendChild(line);
+    }
+
     seq.forEach((b,i)=>{
         const el=document.createElement('div'); el.className=`bead ${b.type}`; el.innerHTML=b.label; let posX = centerX, posY = crossY;
-        if(i === 0) { posX = centerX; posY = crossY; } 
-        else if(i === 1) { posX = centerX; posY = paterY; } 
-        else if(i === 2) { posX = centerX; posY = aveY; } 
-        else if(i === 3) { posX = centerX; posY = credoY; } 
-        else if(i === 4) { 
-            // 第一粒大珠精密定位在大圓環的最底部中央（即與開端直線交接之處）
-            posX = centerX; posY = loopBaseLargeBeadY;
-        }
+        if(i === 0) { posX = centerX; posY = crossY; }
+        else if(i === 1) { posX = centerX; posY = paterY; }
+        else if(i === 2) { posX = centerX; posY = aveY; }
+        else if(i === 3) { posX = centerX; posY = credoY; }
         else {
-            // 其餘 49 顆念珠圍繞成大圓環，半徑左右拉寬，徹底避開正中央的聖像
-            const ringIndex = i - 5; 
-            const totalRingBeads = seq.length - 5;
-            
-            // 核心修正 3：改用精密餘弦與鏡像對稱坐標，徹底修正右側最後一端小珠的編號順序（讓 10 小珠精確跟在 9 後方）
+            // 從第 1 粒大珠起全部加入橢圓環；大珠落在環底正中，與垂直鏈相接
+            const ringIndex = i - 4;
+            const totalRingBeads = seq.length - 4;
             const angle = (ringIndex / totalRingBeads) * 2 * Math.PI + Math.PI / 2;
-            const radiusX = 205 * Math.cos(angle); const radiusY = 165 * Math.sin(angle) * (1 - 0.22 * Math.sin(angle));
-            posX = centerX + radiusX; 
-            posY = (i === seq.length - 1) ? (loopBaseLargeBeadY - 8) : (centerY + radiusY);
+            const radiusX = ringRadiusX * Math.cos(angle);
+            const radiusY = ringRadiusY * Math.sin(angle) * (1 - ringSqueeze * Math.sin(angle));
+            posX = centerX + radiusX;
+            posY = centerY + radiusY;
         }
-        el.style.left = `${posX}px`; el.style.top = `${posY}px`; el.onclick=()=>{ if(playing) { playing=false; synth.cancel(); } closingIdx=0; jump(i); }; box.appendChild(el);
+        el.style.left = `${posX}px`; el.style.top = `${posY}px`; el.onclick=()=>{ beginReadingFrom(i); }; box.appendChild(el);
     });
+    fitRosary();
 }
 function update(){ document.querySelectorAll('.bead').forEach((b,i)=>{ if(i===idx){ b.classList.add('active'); }else b.className=`bead ${seq[i].type}`; }); }
 render();
+window.addEventListener('resize', fitRosary);
+function isCantoneseVoice(v) {
+    const lang = (v.lang || '').toLowerCase();
+    const name = (v.name || '').toLowerCase();
+    return lang.includes('zh-hk') || lang.includes('yue') || name.includes('cantonese') || name.includes('hong kong') || name.includes('粵語') || name.includes('廣東');
+}
 function getBestCantoneseVoice() {
     try {
-        let voices = synth.getVoices(); let target = voices.find(x => x.name.includes('Google') && (x.lang.includes('HK') || x.lang.includes('hk')));
-        if(!target) target = voices.find(x => x.lang.includes('HK') || x.lang.includes('hk') || x.lang.toLowerCase().includes('cantonese')); return target;
+        const voices = synth.getVoices();
+        let target = voices.find(x => x.name.includes('Google') && isCantoneseVoice(x));
+        if (!target) target = voices.find(isCantoneseVoice);
+        return target || null;
+    } catch(e) { return null; }
+}
+function getAssignedVoice() {
+    try {
+        const voices = synth.getVoices();
+        const selected = voices.find(x => x.name === vSel.value);
+        if (selected) return selected;
+        return getBestCantoneseVoice();
     } catch(e) { return null; }
 }
 function loadV() {
     try {
-        let v = synth.getVoices(); if(!v || v.length === 0) return; let hk = v.filter(x => x.lang.includes('HK') || x.lang.includes('hk') || x.lang.toLowerCase().includes('cantonese') || x.name.includes('Hong Kong'));
-        if(hk.length > 0) { vSel.innerHTML = ''; hk.sort((a,b) => b.name.includes('Google') - a.name.includes('Google')); hk.forEach(x => { const o = document.createElement('option'); o.value = x.name; o.innerText = `廣東話 - ${x.name}`; if(x.name.includes('Google')) o.selected = true; vSel.appendChild(o); }); }
+        const voices = synth.getVoices();
+        if (!voices || voices.length === 0) return;
+        const prev = vSel.value;
+        const hk = voices.filter(isCantoneseVoice);
+        if (hk.length === 0) return;
+        vSel.innerHTML = '';
+        hk.sort((a,b) => Number(b.name.includes('Google')) - Number(a.name.includes('Google')));
+        hk.forEach(x => {
+            const o = document.createElement('option');
+            o.value = x.name;
+            o.innerText = `廣東話 - ${x.name}`;
+            vSel.appendChild(o);
+        });
+        const keep = hk.find(x => x.name === prev);
+        vSel.value = keep ? keep.name : (hk.find(x => x.name.includes('Google')) || hk[0]).name;
     } catch(e) {}
 }
-if(speechSynthesis.onvoiceschanged !== undefined) App = speechSynthesis.onvoiceschanged = loadV;
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
 setTimeout(loadV, 300); setTimeout(loadV, 800);
 function optimizeTextForVoice(rawText, voiceObj) {
-    let clean = rawText.replace(/\(\d+\/\d+\)/g, '').replace(/\(第\s*\d+\s*[端遍]\)/g, ''); let voiceName = voiceObj ? voiceObj.name : "";
+    let clean = rawText.replace(/\(\d+\/\d+\)/g, '').replace(/\(第\s*\d+\s*[端遍]\)/g, '');
+    const voiceName = voiceObj ? voiceObj.name : "";
     clean = clean.replace(/妳的/g, "祢的").replace(/妳/g, "祢");
-    if (voiceName.includes("Google") || vSel.value.includes("Google")) { clean = clean.replace(/聖神/g, "聖臣").replace(/垂憐/g, "誰憐").replace(/及普世/g, "同普世"); }
-    else if (voiceName.includes("Sinji") || voiceName.includes("Apple") || (!voiceName && /iPhone|iPad|Macintosh/i.test(navigator.userAgent))) { clean = clean.replace(/亞孟/g, "呀免"); }
+    if (voiceName.includes("Google") || vSel.value.includes("Google")) {
+        clean = clean.replace(/聖神/g, "聖臣").replace(/垂憐/g, "誰憐").replace(/及普世/g, "同普世");
+    } else if (voiceName.includes("Sinji") || voiceName.includes("Apple") || (!voiceName && /iPhone|iPad|Macintosh/i.test(navigator.userAgent))) {
+        clean = clean.replace(/亞孟/g, "呀免");
+    }
     return clean;
 }
+function speakWithAssignedVoice(text, onDone) {
+    loadV();
+    const v = getAssignedVoice();
+    const optimizedText = optimizeTextForVoice(text, v);
+    utter = new SpeechSynthesisUtterance(optimizedText);
+    utter.lang = (v && v.lang) ? v.lang : 'zh-HK';
+    if (v) utter.voice = v;
+    utter.rate = 0.85;
+    utter.onend = () => { if (playing) onDone(); };
+    utter.onerror = (e) => {
+        if (!playing) return;
+        if (e.error === 'interrupted' || e.error === 'canceled') return;
+        setTimeout(() => { if (playing) onDone(); }, 400);
+    };
+    // Chrome can drop speak() if called in the same turn as cancel()
+    setTimeout(() => { if (playing) synth.speak(utter); }, 40);
+}
 function speak(){
-    if(!playing || idx < 0) return; if(idx >= seq.length){ speakClosingSequence(); return; }
-    synth.cancel(); const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update();
-    let v = getBestCantoneseVoice(); let optimizedText = optimizeTextForVoice(b.text, v);
-    utter=new SpeechSynthesisUtterance(optimizedText); utter.lang = 'zh-HK'; if(v) utter.voice = v; 
-    utter.rate = 0.85; // 語速調慢至 0.85 安詳誦念
-    utter.onend=()=>{ if(playing){ idx++; setTimeout(speak, 150); } }; utter.onerror=(e)=>{ console.log("TTS Loop Guard", e); if(playing){ setTimeout(speak, 400); } }; synth.speak(utter);
+    if (!playing || idx < 0) return;
+    if (idx >= seq.length) { speakClosingSequence(); return; }
+    synth.cancel();
+    const b = seq[idx];
+    showPrayer(b.title, b.text);
+    update();
+    speakWithAssignedVoice(b.text, () => { idx++; setTimeout(speak, 150); });
 }
 function speakClosingSequence() {
-    if(!playing) return; if(closingIdx >= closingPrayers.length){ endRosary(); return; }
-    synth.cancel(); const cp = closingPrayers[closingIdx]; tDisp.innerText = cp.title; xDisp.innerText = cp.text; document.querySelectorAll('.bead').forEach(b=>b.classList.remove('active'));
-    let v = getBestCantoneseVoice(); let optimizedText = optimizeTextForVoice(cp.text, v);
-    utter = new SpeechSynthesisUtterance(optimizedText); utter.lang = 'zh-HK'; if(v) utter.voice = v; 
-    utter.rate = 0.85;
-    utter.onend=()=>{ if(playing){ closingIdx++; setTimeout(speakClosingSequence, 150); } }; utter.onerror=()=>{ if(playing){ setTimeout(speakClosingSequence, 400); } }; synth.speak(utter);
+    if (!playing) return;
+    if (closingIdx >= closingPrayers.length) { endRosary(); return; }
+    synth.cancel();
+    const cp = closingPrayers[closingIdx];
+    showPrayer(cp.title, cp.text);
+    document.querySelectorAll('.bead').forEach(b => b.classList.remove('active'));
+    speakWithAssignedVoice(cp.text, () => { closingIdx++; setTimeout(speakClosingSequence, 150); });
 }
 function endRosary() { playing=false; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="重新開始"; closingIdx=0; }
-function jump(i){ idx=i; const b=seq[idx]; tDisp.innerText=b.title; xDisp.innerText=b.text; update(); }
-startBtn.onclick=()=>{ if(!playing){ playing=true; startBtn.disabled=true; pauseBtn.disabled=false; pauseBtn.innerText="暫停"; if(idx===-1||idx>=seq.length){ idx=0; closingIdx=0; } speak(); } };
+function jump(i){ idx=i; const b=seq[idx]; showPrayer(b.title, b.text); update(); }
+function beginReadingFrom(i){
+    synth.cancel();
+    closingIdx = 0;
+    jump(i);
+    playing = true;
+    startBtn.disabled = true;
+    pauseBtn.disabled = false;
+    pauseBtn.innerText = "暫停";
+    speak();
+}
+startBtn.onclick=()=>{ if(!playing){ beginReadingFrom(idx===-1||idx>=seq.length ? 0 : idx); } };
 pauseBtn.onclick=()=>{ if(playing){ playing=false; synth.cancel(); pauseBtn.innerText="繼續"; } else { playing=true; pauseBtn.innerText="暫停"; if(idx>=seq.length){ speakClosingSequence(); } else { speak(); } } };
-resetBtn.onclick=()=>{ playing=false; synth.cancel(); idx=-1; closingIdx=0; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="開始誦念"; pauseBtn.innerText="暫停"; tDisp.innerText="點擊「開始誦念」啟動全自動連續語音功能"; xDisp.innerText="本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。"; document.querySelectorAll('.bead').forEach(b=>{ b.className=`bead ${seq[b.id].type}`; }); };
+resetBtn.onclick=()=>{ playing=false; synth.cancel(); idx=-1; closingIdx=0; startBtn.disabled=false; pauseBtn.disabled=true; startBtn.innerText="開始誦念"; pauseBtn.innerText="暫停"; showPrayer("點擊「開始誦念」啟動全自動連續語音功能", "本系統支援全自動廣東話連續朗誦，念珠會隨語音進度同步跳動發光。"); document.querySelectorAll('.bead').forEach(b=>{ b.className=`bead ${seq[b.id].type}`; }); };
+vSel.onchange=()=>{ if (playing) { synth.cancel(); speak(); } };
 </script>
 </body>
 </html>
