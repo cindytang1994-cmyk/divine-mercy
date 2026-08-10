@@ -92,7 +92,7 @@
             border-radius: 14px;
             padding: 12px 14px;
             flex: 0 1 auto;
-            max-height: 70%;
+            max-height: 78%;
             min-height: 0;
             display: flex;
             flex-direction: column;
@@ -118,8 +118,7 @@
             margin: 0;
             white-space: pre-line;
             overflow: hidden;
-            max-height: calc(1.55em * 5);
-            flex: 0 1 auto;
+            flex: 1 1 auto;
             min-height: 0;
             text-align: left;
         }
@@ -207,14 +206,15 @@
                 gap: 8px;
                 padding: 10px 12px 12px;
             }
-            .left-pane { gap: 16px; height: auto; overflow: visible; }
-            header { padding-top: 16px; }
+            .left-pane { gap: 10px; height: auto; overflow: visible; }
+            header { padding-top: 8px; }
             #display-panel {
-                padding: 8px 10px;
-                max-height: none;
-                flex: 0 0 auto;
+                padding: 10px 12px;
+                max-height: min(52dvh, 420px);
+                flex: 0 1 auto;
+                min-height: 0;
             }
-            #prayer-text { max-height: calc(1.55em * 3); }
+            #prayer-text { font-size: clamp(0.95rem, 3.6vw, 1.12rem); }
             h1 { font-size: 1.05rem; text-align: center; }
             .controls {
                 width: 100%;
@@ -442,9 +442,31 @@ function fitRosary(){
     const dy = (layoutH * scale - layoutH) / 2;
     box.style.margin = `${dy}px ${dx}px`;
 }
+function fitPrayerText(){
+    if (!xDisp) return;
+    xDisp.style.fontSize = '';
+    const styles = getComputedStyle(xDisp);
+    const maxPx = parseFloat(styles.fontSize);
+    const minPx = 12;
+    if (!maxPx || xDisp.clientHeight < 8) return;
+    if (xDisp.scrollHeight <= xDisp.clientHeight + 1) return;
+    let lo = minPx, hi = maxPx, best = minPx;
+    for (let i = 0; i < 14; i++) {
+        const mid = (lo + hi) / 2;
+        xDisp.style.fontSize = mid + 'px';
+        if (xDisp.scrollHeight <= xDisp.clientHeight + 1) {
+            best = mid;
+            lo = mid;
+        } else {
+            hi = mid;
+        }
+    }
+    xDisp.style.fontSize = best + 'px';
+}
 function showPrayer(title, text){
     tDisp.innerText = title;
     xDisp.innerText = text;
+    requestAnimationFrame(() => requestAnimationFrame(fitPrayerText));
 }
 function render(){
     const centerX = 240, centerY = 245;
@@ -750,7 +772,7 @@ initLangSelect();
 applyLanguage(true);
 if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
 setTimeout(loadV, 300); setTimeout(loadV, 800);
-window.addEventListener('resize', fitRosary);
+window.addEventListener('resize', () => { fitRosary(); fitPrayerText(); });
 </script>
 </body>
 </html>
