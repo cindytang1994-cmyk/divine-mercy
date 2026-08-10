@@ -630,14 +630,17 @@ function optimizeTextForVoice(rawText, voiceObj) {
     if (langKey === 'en') return clean.trim();
     clean = clean.replace(/妳的/g, '祢的').replace(/妳/g, '祢');
     if (langKey === 'yue') {
-        // Force ming4 (名 is often misread by TTS; 明 = ming4)
+        // Force ming4 / mun4 (TTS often misreads 名 and 們)
         clean = clean.replace(/名/g, '明');
+        if (isAppleChineseVoice(voiceObj)) {
+            // Amen first so 阿們 is not rewritten by the general 們→門 map
+            clean = clean.replace(/阿們/g, '呀免').replace(/阿们/g, '呀免').replace(/亞孟/g, '呀免').replace(/亚孟/g, '呀免');
+        }
+        clean = clean.replace(/們/g, '門').replace(/们/g, '门');
         if (voiceName.includes('Google') || (preferredVoiceName || '').includes('Google')) {
             clean = clean.replace(/聖神/g, '聖臣').replace(/圣神/g, '圣臣')
                 .replace(/垂憐/g, '誰憐').replace(/垂怜/g, '谁怜')
                 .replace(/及普世/g, '同普世');
-        } else if (isAppleChineseVoice(voiceObj)) {
-            clean = clean.replace(/阿們/g, '呀免').replace(/阿们/g, '呀免').replace(/亞孟/g, '呀免').replace(/亚孟/g, '呀免');
         }
     }
     return clean.trim();
