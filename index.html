@@ -269,10 +269,10 @@
                 </select>
                 <label for="speed-select" id="speed-label">速度：</label>
                 <select id="speed-select">
-                    <option value="normal">正常</option>
+                    <option value="fastest">最快</option>
                     <option value="fast">快</option>
-                    <option value="current" selected>目前</option>
-                    <option value="slower">較慢</option>
+                    <option value="normal" selected>正常</option>
+                    <option value="slow">慢</option>
                     <option value="slowest">最慢</option>
                 </select>
             </div>
@@ -338,10 +338,10 @@ const UI = {
         langLabel: '語言：',
         speedLabel: '速度：',
         speedOptions: {
-            normal: '正常',
+            fastest: '最快',
             fast: '快',
-            current: '目前',
-            slower: '較慢',
+            normal: '正常',
+            slow: '慢',
             slowest: '最慢'
         },
         idleTitle: '點擊「開始誦念」啟動全自動連續語音功能',
@@ -362,10 +362,10 @@ const UI = {
         langLabel: '语言：',
         speedLabel: '速度：',
         speedOptions: {
-            normal: '正常',
+            fastest: '最快',
             fast: '快',
-            current: '目前',
-            slower: '较慢',
+            normal: '正常',
+            slow: '慢',
             slowest: '最慢'
         },
         idleTitle: '点击「开始诵念」启动全自动连续语音功能',
@@ -386,10 +386,10 @@ const UI = {
         langLabel: 'Language:',
         speedLabel: 'Speed:',
         speedOptions: {
-            normal: 'Normal',
+            fastest: 'Fastest',
             fast: 'Fast',
-            current: 'Current',
-            slower: 'Slower',
+            normal: 'Normal',
+            slow: 'Slow',
             slowest: 'Slowest'
         },
         idleTitle: 'Tap “Start” for continuous voice guidance',
@@ -442,14 +442,16 @@ const speedLabel = document.getElementById('speed-label');
 const LANG_PREF_KEY = 'pray-lang';
 const VOICE_PREF_KEY = 'pray-voice';
 const SPEED_PREF_KEY = 'pray-speed';
-const SPEED_ORDER = ['normal', 'fast', 'current', 'slower', 'slowest'];
+const SPEED_ORDER = ['fastest', 'fast', 'normal', 'slow', 'slowest'];
 const SPEED_RATES = {
-    normal: 1.0,
-    fast: 1.2,
-    current: 0.85,
-    slower: 0.7,
+    fastest: 1.2,
+    fast: 1.0,
+    normal: 0.85,
+    slow: 0.7,
     slowest: 0.55
 };
+const SPEED_PREF_VER_KEY = 'pray-speed-v';
+const SPEED_PREF_VER = '3';
 
 function currentLangKey() {
     return LANG_META[lSel.value] ? lSel.value : 'zh-Hant-yue';
@@ -608,7 +610,7 @@ function applyUI(showIdle) {
         o.textContent = ui.speedOptions[k];
         sSel.appendChild(o);
     });
-    sSel.value = SPEED_RATES[prevSpeed] != null ? prevSpeed : 'current';
+    sSel.value = SPEED_RATES[prevSpeed] != null ? prevSpeed : 'normal';
     resetBtn.innerText = ui.reset;
     if (showIdle || (idx === -1 && !playing)) {
         showPrayer(ui.idleTitle, ui.idleText);
@@ -709,12 +711,30 @@ function initLangSelect() {
     localStorage.setItem(LANG_PREF_KEY, lSel.value);
 }
 function currentSpeechRate() {
-    const key = SPEED_RATES[sSel.value] != null ? sSel.value : 'current';
+    const key = SPEED_RATES[sSel.value] != null ? sSel.value : 'normal';
     return SPEED_RATES[key];
 }
+function migrateSpeedPref(saved) {
+    let key = saved;
+    const ver = parseInt(localStorage.getItem(SPEED_PREF_VER_KEY) || '0', 10);
+    if (ver < 2) {
+        // v1: current=mid(0.85), normal=1.0
+        if (key === 'current') key = 'normal';
+        else if (key === 'normal') key = 'faster';
+    }
+    if (ver < 3) {
+        // v2 → v3 names; keep rates aligned with labels
+        if (key === 'fast') key = 'fastest';
+        else if (key === 'faster') key = 'fast';
+        else if (key === 'slower') key = 'slow';
+        else if (key === 'current') key = 'normal';
+    }
+    localStorage.setItem(SPEED_PREF_VER_KEY, SPEED_PREF_VER);
+    return key && SPEED_RATES[key] != null ? key : null;
+}
 function initSpeedSelect() {
-    const saved = localStorage.getItem(SPEED_PREF_KEY);
-    sSel.value = SPEED_RATES[saved] != null ? saved : 'current';
+    const saved = migrateSpeedPref(localStorage.getItem(SPEED_PREF_KEY));
+    sSel.value = saved || 'normal';
     localStorage.setItem(SPEED_PREF_KEY, sSel.value);
 }
 function isAppleChineseVoice(voiceObj) {
