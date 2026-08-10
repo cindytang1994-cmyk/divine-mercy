@@ -73,6 +73,7 @@
         .voice-row {
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 6px;
             min-width: 0;
         }
@@ -87,7 +88,10 @@
             min-width: 0;
             flex: 1;
         }
+        #lang-select { flex: 1 1 auto; min-width: 0; }
+        #speed-select { flex: 0 1 auto; width: auto; max-width: 9.5rem; }
         #display-panel {
+            position: relative;
             background: var(--panel);
             border-radius: 14px;
             padding: 12px 14px;
@@ -101,10 +105,25 @@
             overflow: hidden;
             border: 1px solid rgba(212,175,55,0.18);
         }
+        #prayer-progress {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            z-index: 1;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            font-variant-numeric: tabular-nums;
+            color: rgba(212, 175, 55, 0.85);
+            line-height: 1;
+            pointer-events: none;
+        }
+        #prayer-progress:empty { display: none; }
         #prayer-title {
             color: var(--p-gold);
             font-size: clamp(1rem, 1.8vw, 1.35rem);
             margin: 0 0 8px 0;
+            padding: 0 2.6rem;
             flex: 0 0 auto;
             line-height: 1.35;
             overflow: hidden;
@@ -248,9 +267,18 @@
                     <option value="zh-Hans">普通话 - 简体中文</option>
                     <option value="en">English</option>
                 </select>
+                <label for="speed-select" id="speed-label">速度：</label>
+                <select id="speed-select">
+                    <option value="normal">正常</option>
+                    <option value="fast">快</option>
+                    <option value="current" selected>目前</option>
+                    <option value="slower">較慢</option>
+                    <option value="slowest">最慢</option>
+                </select>
             </div>
         </div>
         <div id="display-panel">
+            <div id="prayer-progress" aria-hidden="true"></div>
             <h2 id="prayer-title">點擊「開始誦念」啟動全自動連續語音功能</h2>
             <p id="prayer-text">本系統支援中文語音朗誦（廣東話／國語／普通話），念珠會隨語音進度同步跳動發光。可在上方切換語言與語音。</p>
         </div>
@@ -308,11 +336,18 @@ const UI = {
         reset: '重設',
         restart: '重新開始',
         langLabel: '語言：',
+        speedLabel: '速度：',
+        speedOptions: {
+            normal: '正常',
+            fast: '快',
+            current: '目前',
+            slower: '較慢',
+            slowest: '最慢'
+        },
         idleTitle: '點擊「開始誦念」啟動全自動連續語音功能',
         idleText: '本系統支援中文語音朗誦（廣東話／國語／普通話）及英語，念珠會隨語音進度同步跳動發光。可在上方切換語言。',
         decadeTitle: (n, t) => `第 ${n} 端 · ${t}`,
         decadeText: (n, x) => `(第 ${n} 端)\n${x}`,
-        beadText: (b, x) => `(${b}/10)\n${x}`,
         passText: (n, x) => `(第 ${n} 遍)\n${x}`
     },
     'zh-Hans': {
@@ -325,11 +360,18 @@ const UI = {
         reset: '重设',
         restart: '重新开始',
         langLabel: '语言：',
+        speedLabel: '速度：',
+        speedOptions: {
+            normal: '正常',
+            fast: '快',
+            current: '目前',
+            slower: '较慢',
+            slowest: '最慢'
+        },
         idleTitle: '点击「开始诵念」启动全自动连续语音功能',
         idleText: '本系统支持中文语音朗诵（广东话／国语／普通话）及英语，念珠会随语音进度同步跳动发光。可在上方切换语言。',
         decadeTitle: (n, t) => `第 ${n} 端 · ${t}`,
         decadeText: (n, x) => `(第 ${n} 端)\n${x}`,
-        beadText: (b, x) => `(${b}/10)\n${x}`,
         passText: (n, x) => `(第 ${n} 遍)\n${x}`
     },
     en: {
@@ -342,11 +384,18 @@ const UI = {
         reset: 'Reset',
         restart: 'Start Again',
         langLabel: 'Language:',
+        speedLabel: 'Speed:',
+        speedOptions: {
+            normal: 'Normal',
+            fast: 'Fast',
+            current: 'Current',
+            slower: 'Slower',
+            slowest: 'Slowest'
+        },
         idleTitle: 'Tap “Start” for continuous voice guidance',
         idleText: 'This app supports Chinese (Cantonese / Mandarin) and English speech. The beads light up in sync with the prayer. Choose a language above.',
         decadeTitle: (n, t) => `Decade ${n} · ${t}`,
         decadeText: (n, x) => `(Decade ${n})\n${x}`,
-        beadText: (b, x) => `(${b}/10)\n${x}`,
         passText: (n, x) => `(${n} of 3)\n${x}`
     }
 };
@@ -382,13 +431,25 @@ const pauseBtn = document.getElementById('pause-btn');
 const resetBtn = document.getElementById('reset-btn');
 const tDisp = document.getElementById('prayer-title');
 const xDisp = document.getElementById('prayer-text');
+const pDisp = document.getElementById('prayer-progress');
 const box = document.getElementById('beads-container');
 const lSel = document.getElementById('lang-select');
+const sSel = document.getElementById('speed-select');
 const stage = document.getElementById('rosary-stage');
 const appTitle = document.getElementById('app-title');
 const langLabel = document.getElementById('lang-label');
+const speedLabel = document.getElementById('speed-label');
 const LANG_PREF_KEY = 'pray-lang';
 const VOICE_PREF_KEY = 'pray-voice';
+const SPEED_PREF_KEY = 'pray-speed';
+const SPEED_ORDER = ['normal', 'fast', 'current', 'slower', 'slowest'];
+const SPEED_RATES = {
+    normal: 1.0,
+    fast: 1.2,
+    current: 0.85,
+    slower: 0.7,
+    slowest: 0.55
+};
 
 function currentLangKey() {
     return LANG_META[lSel.value] ? lSel.value : 'zh-Hant-yue';
@@ -413,12 +474,12 @@ function buildSequence() {
     seq.push({id:3,type:"blue-style earlier-small-blue",title:P.c.t,text:P.c.x,label:""});
     seq.push({id:4,type:"blue-style large-blue",title:ui.decadeTitle(1, P.e.t),text:ui.decadeText(1, P.e.x),label:""});
     for (let b = 0; b < 10; b++) {
-        seq.push({id:seq.length,type:"small",title:P.h.t,text:ui.beadText(b + 1, P.h.x),label:(b + 1).toString()});
+        seq.push({id:seq.length,type:"small",title:P.h.t,text:P.h.x,progress:`${b + 1}/10`,label:(b + 1).toString()});
     }
     for (let d = 1; d < 5; d++) {
         seq.push({id:seq.length,type:"blue-style large-blue",title:ui.decadeTitle(d + 1, P.e.t),text:ui.decadeText(d + 1, P.e.x),label:""});
         for (let b = 0; b < 10; b++) {
-            seq.push({id:seq.length,type:"small",title:P.h.t,text:ui.beadText(b + 1, P.h.x),label:(b + 1).toString()});
+            seq.push({id:seq.length,type:"small",title:P.h.t,text:P.h.x,progress:`${b + 1}/10`,label:(b + 1).toString()});
         }
     }
     closingPrayers = [
@@ -463,9 +524,10 @@ function fitPrayerText(){
     }
     xDisp.style.fontSize = best + 'px';
 }
-function showPrayer(title, text){
+function showPrayer(title, text, progress){
     tDisp.innerText = title;
     xDisp.innerText = text;
+    if (pDisp) pDisp.textContent = progress || '';
     requestAnimationFrame(() => requestAnimationFrame(fitPrayerText));
 }
 function render(){
@@ -528,6 +590,7 @@ function applyUI(showIdle) {
     document.title = ui.title;
     appTitle.textContent = ui.title;
     langLabel.textContent = ui.langLabel;
+    speedLabel.textContent = ui.speedLabel;
     const prev = lSel.value;
     lSel.innerHTML = '';
     LANG_ORDER.forEach(k => {
@@ -537,6 +600,15 @@ function applyUI(showIdle) {
         lSel.appendChild(o);
     });
     lSel.value = LANG_META[prev] ? prev : 'zh-Hant-yue';
+    const prevSpeed = sSel.value;
+    sSel.innerHTML = '';
+    SPEED_ORDER.forEach(k => {
+        const o = document.createElement('option');
+        o.value = k;
+        o.textContent = ui.speedOptions[k];
+        sSel.appendChild(o);
+    });
+    sSel.value = SPEED_RATES[prevSpeed] != null ? prevSpeed : 'current';
     resetBtn.innerText = ui.reset;
     if (showIdle || (idx === -1 && !playing)) {
         showPrayer(ui.idleTitle, ui.idleText);
@@ -636,6 +708,15 @@ function initLangSelect() {
     lSel.value = saved && LANG_META[saved] ? saved : 'zh-Hant-yue';
     localStorage.setItem(LANG_PREF_KEY, lSel.value);
 }
+function currentSpeechRate() {
+    const key = SPEED_RATES[sSel.value] != null ? sSel.value : 'current';
+    return SPEED_RATES[key];
+}
+function initSpeedSelect() {
+    const saved = localStorage.getItem(SPEED_PREF_KEY);
+    sSel.value = SPEED_RATES[saved] != null ? saved : 'current';
+    localStorage.setItem(SPEED_PREF_KEY, sSel.value);
+}
 function isAppleChineseVoice(voiceObj) {
     const name = voiceObj ? (voiceObj.name || '') : '';
     if (name.includes('Sinji') || name.includes('Meijia') || name.includes('Tingting') || name.includes('Ting-Ting') || name.includes('Apple')) return true;
@@ -673,7 +754,7 @@ function speakWithAssignedVoice(text, onDone) {
     const voiceKey = currentMeta().voice;
     utter.lang = (v && v.lang) ? v.lang : (langFallback[voiceKey] || 'zh-HK');
     if (v) utter.voice = v;
-    utter.rate = 0.85;
+    utter.rate = currentSpeechRate();
     utter.onend = () => { if (playing) onDone(); };
     utter.onerror = (e) => {
         if (!playing) return;
@@ -687,7 +768,7 @@ function speak(){
     if (idx >= seq.length) { speakClosingSequence(); return; }
     synth.cancel();
     const b = seq[idx];
-    showPrayer(b.title, b.text);
+    showPrayer(b.title, b.text, b.progress);
     update();
     speakWithAssignedVoice(b.text, () => { idx++; setTimeout(speak, 150); });
 }
@@ -707,7 +788,7 @@ function endRosary() {
     startBtn.innerText = currentUI().restart;
     closingIdx = 0;
 }
-function jump(i){ idx=i; const b=seq[idx]; showPrayer(b.title, b.text); update(); }
+function jump(i){ idx=i; const b=seq[idx]; showPrayer(b.title, b.text, b.progress); update(); }
 function beginReadingFrom(i){
     synth.cancel();
     closingIdx = 0;
@@ -724,7 +805,7 @@ function applyLanguage(showIdle) {
     applyUI(!!showIdle);
     refreshControlsForState();
     if (idx >= 0 && idx < seq.length) {
-        showPrayer(seq[idx].title, seq[idx].text);
+        showPrayer(seq[idx].title, seq[idx].text, seq[idx].progress);
         update();
     } else if (idx >= seq.length && closingIdx > 0 && closingIdx <= closingPrayers.length) {
         const cp = closingPrayers[Math.min(closingIdx, closingPrayers.length - 1)];
@@ -767,8 +848,13 @@ lSel.onchange=()=>{
     applyLanguage(idx === -1 && !playing);
     if (playing) { synth.cancel(); speak(); }
 };
+sSel.onchange=()=>{
+    localStorage.setItem(SPEED_PREF_KEY, sSel.value);
+    if (playing) { synth.cancel(); speak(); }
+};
 
 initLangSelect();
+initSpeedSelect();
 applyLanguage(true);
 if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadV;
 setTimeout(loadV, 300); setTimeout(loadV, 800);
